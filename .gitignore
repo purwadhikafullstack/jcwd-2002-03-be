@@ -1,4 +1,4 @@
 node_modules
 .env
 src/public/profile_pictures/**
-src/public/product/**
+src/public/products/**
