@@ -8,11 +8,18 @@ const Cart = (sequelize) => {
             autoIncrement: true,
             allowNull: false,
             // product_id
+            // user_id
         },
-        quntities: {
+        quntity: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        price: {
             type: DataTypes.INTEGER,
             allowNull: false
         }
+    }, {
+        paranoid: true
     });
 };
 
