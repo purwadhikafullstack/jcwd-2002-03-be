@@ -11,50 +11,79 @@ const sequelize = new Sequelize({
 });
 
 // models
+const Admin = require("../models/admin")(sequelize)
 const Address = require("../models/address")(sequelize)
 const Cart = require("../models/cart")(sequelize)
 const Category = require("../models/categories")(sequelize)
 const Inventory = require("../models/inventory")(sequelize)
-const Order = require("../models/order")(sequelize)
 const Product = require("../models/product")(sequelize)
-const Report = require("../models/report")(sequelize)
-const Stock_detail = require("../models/stock_detail")(sequelize)
-const Type = require("../models/type")(sequelize)
 const User = require("../models/user")(sequelize)
+const VerificationToken = require('../models/verificationEmail')(sequelize);
+const ForgotPasswordToken = require('../models/forgotPassword')(sequelize);
+const Stock_order = require('../models/stock_order')(sequelize)
+const Stock_opname = require("../models/stock_opname")(sequelize)
+const Product_image = require("../models/product_image")(sequelize)
+const Transaction = require("../models/transaction")(sequelize)
+const Transaction_items = require("../models/transaction_items")(sequelize)
+const Payment = require('../models/payment')(sequelize)
 
 // Associations
 
 // 1:M
 Address.belongsTo(User)
 User.hasMany(Address)
-Inventory.belongsTo(Stock_detail)
-Stock_detail.hasMany(Inventory)
-Product.hasMany(Stock_detail)
-Report.hasMany(Order)
-Order.belongsTo(Report)
-Report.hasMany(Stock_detail)
-Stock_detail.belongsTo(Report)
 
+Product_image.belongsTo(Product)
+Product.hasMany(Product_image)
+
+Transaction_items.belongsTo(Transaction)
+Transaction.hasMany(Transaction_items)
+Transaction_items.belongsTo(Product)
+Product.hasMany(Transaction_items)
+
+Cart.belongsTo(User)
+User.hasMany(Cart)
+Cart.belongsTo(Product)
+Product.hasMany(Cart)
 
 // M:N
-Product.belongsToMany(User, { through: Order })
-Product.belongsToMany(User, { through: Cart, as: "user_cart" })
-Stock_detail.belongsToMany(Product, { through: Inventory })
+VerificationToken.belongsTo(User);
+User.hasMany(VerificationToken);
+
+ForgotPasswordToken.belongsTo(User);
+User.hasMany(ForgotPasswordToken);
+
+Stock_order.belongsTo(Product)
+Product.hasMany(Stock_order)
+Stock_order.belongsTo(Admin)
+Admin.hasMany(Stock_order)
+
+Payment.belongsTo(Admin)
+Admin.hasMany(Payment)
+Payment.belongsTo(Transaction)
+Transaction.hasMany(Payment)
+
+Stock_opname.belongsTo(Product)
+Product.hasMany(Stock_opname)
+Stock_opname.belongsToMany(Stock_order, { through: "buy_stock" })
+Stock_opname.belongsToMany(Transaction, { through: "stock_sold" })
+
+Inventory.belongsTo(Product)
+Product.hasMany(Inventory)
+Inventory.belongsTo(Transaction)
+Transaction.hasMany(Inventory)
+
 Category.belongsToMany(Product, { through: "product_category" })
-Type.belongsToMany(Product, { through: "product_type" })
-
-
-
 module.exports = {
     Address,
+    Admin,
     Cart,
     Category,
     Inventory,
-    Order,
     Product,
-    Report,
-    Stock_detail,
-    Type,
     User,
-    sequelize
+    sequelize,
+    Stock_order,
+    VerificationToken,
+    ForgotPasswordToken
 }
