@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
-const Order = (sequelize) => {
-    return sequelize.define("Order", {
+const Transaction = (sequelize) => {
+    return sequelize.define("Transaction", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -11,7 +11,7 @@ const Order = (sequelize) => {
             // user_id
             // admin_id
         },
-        total_order: {
+        total_price: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -46,4 +46,4 @@ const Order = (sequelize) => {
     });
 };
 
-module.exports = Order;
+module.exports = Transaction;

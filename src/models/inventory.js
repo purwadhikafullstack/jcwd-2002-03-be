@@ -4,14 +4,24 @@ const Inventory = (sequelize) => {
     return sequelize.define("inventory", {
         id: {
             type: DataTypes.INTEGER,
+            allowNull: true,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
-            // stock_detail
+            // productId
+            // transactionId
         },
         quantity: {
             type: DataTypes.INTEGER,
-            allowNull: true
+            allowNull: true,
+        },
+        expired_date: {
+            type: DataTypes.DATE,
+            allowNull: false
+        }
+        ,
+        type: {
+            type: DataTypes.STRING,
+            allowNull: true,
         }
     });
 };

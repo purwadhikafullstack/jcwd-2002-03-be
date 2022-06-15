@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
-const User = (sequelize) => {
-    return sequelize.define('User', {
+const Admin = (sequelize) => {
+    return sequelize.define('Admin', {
         username: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -18,19 +18,7 @@ const User = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        is_verified: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-        image_url: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        telephone: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
     });
 };
 
-module.exports = User;
+module.exports = Admin;
