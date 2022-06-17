@@ -26,8 +26,8 @@ const User = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        telephone: {
-            type: DataTypes.INTEGER,
+        phone: {
+            type: DataTypes.STRING,
             allowNull: true,
         },
     });

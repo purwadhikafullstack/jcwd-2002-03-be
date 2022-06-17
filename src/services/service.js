@@ -1,26 +1,23 @@
 class Service {
-    static handleError = ({
-        message = "server Errorr",
-        statusCode = 500
-    }) => {
+    static handleError = ({ message = "Server error", statusCode = 500 }) => {
         return {
             success: false,
             message,
-            statusCode
-        }
-    }
+            statusCode,
+        };
+    };
 
-    static handleSucces = ({
-        message = "request Success",
-        statusCode = 200,
+    static handleSuccess = ({
         data = undefined,
+        message = "Request success",
+        statusCode = 200,
     }) => {
         return {
             success: true,
+            data,
             message,
             statusCode,
-            data
-        }
+        };
     }
 }
 
