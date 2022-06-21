@@ -9,6 +9,7 @@ const { nanoid } = require('nanoid');
 const moment = require("moment");
 const { OAuth2Client } = require("google-auth-library")
 const client = new OAuth2Client(process.env.CLIENT_ID)
+const { generateToken } = require("../../lib/jwt")
 
 class authService extends Service {
     static register = async (req) => {
