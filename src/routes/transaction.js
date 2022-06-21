@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const controllers = require("../middlewares/controllers")
+const controllers = require("../middleware/controllers")
 
 
 module.exports = router

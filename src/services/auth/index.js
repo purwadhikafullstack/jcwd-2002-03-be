@@ -107,7 +107,6 @@ class authService extends Service {
 
             const token = generateToken({
                 id: findUser.id,
-                role: findUser.role,
             });
 
             return this.handleSuccess({

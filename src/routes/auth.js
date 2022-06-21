@@ -1,6 +1,6 @@
 const router = require("express").Router()
-const controllers = require("../middlewares/controllers")
-const { authorizedToken } = require("../middlewares/authMiddleware")
+const controllers = require("../middleware/controllers")
+const { authorizedToken } = require("../middleware/authMiddleware")
 const authService = require("../services/auth/index.js")
 
 router.post("/register", controllers(authService.register))
