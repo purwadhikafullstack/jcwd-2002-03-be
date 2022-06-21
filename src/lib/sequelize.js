@@ -13,6 +13,7 @@ const sequelize = new Sequelize({
 // models
 const Admin = require("../models/admin")(sequelize)
 const Address = require("../models/address")(sequelize)
+const Buy_stock = require("../models/buy_stock")(sequelize)
 const Cart = require("../models/cart")(sequelize)
 const Category = require("../models/categories")(sequelize)
 const Inventory = require("../models/inventory")(sequelize)
@@ -22,6 +23,7 @@ const VerificationToken = require('../models/verificationEmail')(sequelize);
 const ForgotPasswordToken = require('../models/forgotPassword')(sequelize);
 const Stock_order = require('../models/stock_order')(sequelize)
 const Stock_opname = require("../models/stock_opname")(sequelize)
+const Stock_sold = require("../models/stock_sold")(sequelize)
 const Product_image = require("../models/product_image")(sequelize)
 const Transaction = require("../models/transaction")(sequelize)
 const Transaction_items = require("../models/transaction_items")(sequelize)
@@ -36,6 +38,8 @@ User.hasMany(Address)
 Product_image.belongsTo(Product)
 Product.hasMany(Product_image)
 
+
+// M:N
 Transaction_items.belongsTo(Transaction)
 Transaction.hasMany(Transaction_items)
 Transaction_items.belongsTo(Product)
@@ -46,7 +50,6 @@ User.hasMany(Cart)
 Cart.belongsTo(Product)
 Product.hasMany(Cart)
 
-// M:N
 VerificationToken.belongsTo(User);
 User.hasMany(VerificationToken);
 
@@ -55,8 +58,8 @@ User.hasMany(ForgotPasswordToken);
 
 Stock_order.belongsTo(Product)
 Product.hasMany(Stock_order)
-Stock_order.belongsTo(Admin)
-Admin.hasMany(Stock_order)
+// Stock_order.belongsTo(Admin)
+// Admin.hasMany(Stock_order)
 
 Payment.belongsTo(Admin)
 Admin.hasMany(Payment)
@@ -65,8 +68,8 @@ Transaction.hasMany(Payment)
 
 Stock_opname.belongsTo(Product)
 Product.hasMany(Stock_opname)
-Stock_opname.belongsToMany(Stock_order, { through: "buy_stock" })
-Stock_opname.belongsToMany(Transaction, { through: "stock_sold" })
+Stock_opname.belongsToMany(Stock_order, { through: Buy_stock })
+Stock_opname.belongsToMany(Transaction, { through: Stock_sold })
 
 Inventory.belongsTo(Product)
 Product.hasMany(Inventory)
@@ -77,6 +80,7 @@ Category.belongsToMany(Product, { through: "product_category" })
 module.exports = {
     Address,
     Admin,
+    Buy_stock,
     Cart,
     Category,
     Inventory,
@@ -84,6 +88,8 @@ module.exports = {
     User,
     sequelize,
     Stock_order,
+    Stock_opname,
+    Stock_sold,
     VerificationToken,
     ForgotPasswordToken
 }

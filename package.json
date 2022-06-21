@@ -11,10 +11,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "google-auth-library": "^8.0.2",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.3",
+    "mustache": "^4.2.0",
     "mysql2": "^2.3.3",
+    "nanoid": "^3.3.2",
+    "nodemailer": "^6.7.5",
     "sequelize": "^6.20.1"
   }
 }
