@@ -15,7 +15,7 @@ const mailer = async ({ subject, to, text, html }) => {
     })
     await transport.sendMail({
         subject: subject || "test subject",
-        to: to || "monpai732@gmail.com",
+        to: to || "rahman.adhitya23@gmail.com",
         text: text || "test nodemailer",
         html: html || "<h1> This is sent from my Express API</h1>"
     })
