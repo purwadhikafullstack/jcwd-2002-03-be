@@ -13,10 +13,6 @@ const Stock_opname = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
-        type: {
-            type: DataTypes.STRING,
-            allowNull: false
-        }
     })
 }
 
