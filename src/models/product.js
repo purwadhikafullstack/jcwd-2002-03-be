@@ -18,11 +18,11 @@ const Product = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        dicount: {
-            type: DataTypes.DECIMAL,
+        discount: {
+            type: DataTypes.FLOAT,
             allowNull: true
         },
-        Indikasi: {
+        indikasi: {
             type: DataTypes.STRING,
             allowNull: true
         },
@@ -43,12 +43,12 @@ const Product = (sequelize) => {
             allowNull: true
         },
         principal: {
-            type: DataTypes.BOOLEAN,
+            type: DataTypes.STRING,
             allowNull: false
         },
         NIE: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
     })
 }
