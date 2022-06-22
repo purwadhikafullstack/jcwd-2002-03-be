@@ -1,10 +1,9 @@
 class Service {
-    static handleError = ({ message = "Server error", statusCode = 500, redirect = "" }) => {
+    static handleError = ({ message = "Server error", statusCode = 500 }) => {
         return {
             success: false,
             message,
             statusCode,
-            redirect
         };
     };
 
@@ -12,15 +11,26 @@ class Service {
         data = undefined,
         message = "Request success",
         statusCode = 200,
-        redirect = ""
     }) => {
         return {
             success: true,
             data,
             message,
             statusCode,
-            redirect
         };
+    }
+
+    static handleRedirect = ({
+        message = "",
+        statusCode = 200,
+        link,
+        success = true }) => {
+        return {
+            success,
+            message,
+            link,
+            statusCode
+        }
     }
 }
 
