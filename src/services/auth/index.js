@@ -302,5 +302,4 @@ class authService extends Service {
     }
   };
 }
-
 module.exports = authService;
