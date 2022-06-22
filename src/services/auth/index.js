@@ -14,7 +14,7 @@ const { generateToken } = require("../../lib/jwt")
 class authService extends Service {
     static register = async (req) => {
         try {
-            const { name, email, password, phone } = req.body;
+            const { name, email, password } = req.body;
 
             const availableEmail = await User.findOne({
                 where: {
@@ -34,14 +34,13 @@ class authService extends Service {
                 name,
                 email,
                 password: hashedPassword,
-                phone
             });
 
             const verificationToken = nanoid(40)
 
             await VerificationToken.create({
                 token: verificationToken,
-                user_id: newUser.id,
+                UserId: newUser.id,
                 valid_until: moment().add(1, "hour"),
                 is_valid: true,
             });
@@ -72,55 +71,6 @@ class authService extends Service {
             console.log(err);
 
             this.handleError({
-                message: "Server Error",
-                statusCode: 500,
-            });
-        }
-    };
-    static login = async (req) => {
-        try {
-            // const { name, password } = req.body;
-            const { credential, password } = req.body;
-
-            const findUser = await User.findOne({
-                where: {
-                    email: credential
-                }
-            });
-
-            if (!findUser) {
-                return this.handleError({
-                    message: "Wrong email address or password",
-                    statusCode: 400,
-                });
-            }
-
-            const isPasswordCorrect = bcrypt.compareSync(password, findUser.password);
-
-            if (!isPasswordCorrect) {
-                return this.handleError({
-                    message: "wrong name or password",
-                    statusCode: 400,
-                });
-            }
-
-            delete findUser.dataValues.password;
-
-            const token = generateToken({
-                id: findUser.id,
-            });
-
-            return this.handleSuccess({
-                message: "Logged in user",
-                statusCode: 200,
-                data: {
-                    user: findUser,
-                    token,
-                },
-            });
-        } catch (err) {
-            console.log(err);
-            return this.handleError({
                 message: "Server Error",
                 statusCode: 500,
             });
@@ -161,10 +111,9 @@ class authService extends Service {
 
             return this.handleSuccess({
                 message: "email address verified",
-                statusCode: 201
+                statusCode: 201,
+                redirect: `http://localhost:3000/verification`
             })
-
-            // return res.redirect(`http://localhost:3000/verification`);
         } catch (err) {
             console.log(err);
             this.handleError({})

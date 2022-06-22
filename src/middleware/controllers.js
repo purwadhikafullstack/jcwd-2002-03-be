@@ -8,7 +8,7 @@ const controllers = ((services) => {
             return res.status(serviceControllers.statusCode || 200).json({
                 message: serviceControllers.message,
                 result: serviceControllers.data
-            })
+            }).redirect(serviceControllers.redirect)
         } catch (err) {
             console.log(err)
             return res.status(err.statusCode).json({
