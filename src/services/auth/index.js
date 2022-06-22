@@ -1,5 +1,6 @@
 const Service = require("../service");
-const { User, ForgotPasswordToken, VerificationToken } = require("../../lib/sequelize");
+const { User, ForgotPasswordToken, VerificationToken, Admin } = require("../../lib/sequelize");
+const { generateToken } = require("../../lib/jwt")
 const { Op } = require("sequelize");
 const bcrypt = require('bcrypt')
 const mustache = require("mustache")
@@ -14,6 +15,19 @@ class authService extends Service {
     static register = async (req) => {
         try {
             const { name, email, password } = req.body;
+
+            const checkEmailAdmin = await Admin.findOne({
+                where: {
+                    email
+                }
+            })
+
+            if (checkEmailAdmin) {
+                return this.handleError({
+                    message: "email address not alowed to register, try another email address",
+                    statusCode: 404
+                })
+            }
 
             const availableEmail = await User.findOne({
                 where: {
@@ -69,7 +83,7 @@ class authService extends Service {
         } catch (err) {
             console.log(err);
 
-            this.handleError({
+            return this.handleError({
                 message: "Server Error",
                 statusCode: 500,
             });
@@ -90,7 +104,7 @@ class authService extends Service {
             });
 
             if (!findToken) {
-                this.handleError({
+                return this.handleError({
                     message: "your token is invalid",
                     statusCode: "404"
                 })
@@ -108,14 +122,115 @@ class authService extends Service {
             findToken.is_valid = false;
             findToken.save();
 
-            return this.handleSuccess({
+            return this.handleRedirect({
                 message: "email address verified",
                 statusCode: 201,
-                redirect: `http://localhost:3000/verification`
+                link: `http://localhost:3000/verification`
             })
         } catch (err) {
             console.log(err);
-            this.handleError({})
+            return this.handleError({})
+        }
+    }
+
+    static adminRegister = async (req) => {
+        try {
+            const { name, email, password } = req.body;
+
+            const checkEmailUser = await User.findOne({
+                where: {
+                    email
+                }
+            });
+
+            if (checkEmailUser) {
+                return this.handleError({
+                    message: "This email has been registered as user account, email used by the user cannot be used by the admin",
+                    statusCode: 400,
+                });
+            }
+
+            const checkEmailAdmin = await Admin.findOne({
+                where: {
+                    email
+                }
+            });
+
+            if (checkEmailAdmin) {
+                return this.handleError({
+                    message: "This email has been registered, if you forget your password, you can reset your password",
+                    statusCode: 400,
+                });
+            }
+
+            const hashedPassword = bcrypt.hashSync(password, 5);
+            const newAdmin = await Admin.create({
+                name,
+                email,
+                password: hashedPassword,
+            });
+
+            return this.handleSuccess({
+                message: "your account was created successfully",
+                statusCode: 201,
+                data: newAdmin,
+            });
+        } catch (err) {
+            console.log(err);
+
+            return this.handleError({
+                message: "Server Error",
+                statusCode: 500,
+            });
+        }
+    };
+    static adminLogin = async (req) => {
+        try {
+            const { email, password } = req.body
+
+            const findAdmin = await Admin.findOne({
+                where: {
+                    email
+                }
+            })
+
+            if (!findAdmin) {
+                return this.handleError({
+                    message: "wrong email address",
+                    statusCode: 400
+                })
+            }
+
+            const isPasswordCorrect = bcrypt.compareSync(password, findAdmin.password);
+
+            if (!isPasswordCorrect) {
+                return this.handleError({
+                    message: "Wrong Password",
+                    statusCode: 400
+                })
+            }
+
+            delete findAdmin.dataValues.password
+
+            const token = generateToken({
+                id: findAdmin.id
+            });
+
+            const user = { ...findAdmin.dataValues, role: "admin" }
+            // const data = { ...findAdmin, token }
+            return this.handleSuccess({
+                message: "login admin success",
+                statusCode: 200,
+                data: {
+                    user,
+                    token,
+                },
+            })
+
+        } catch (err) {
+            console.log(err)
+            return this.handleError({})
+
         }
     }
 }
