@@ -22,7 +22,7 @@ const controllers = ((services) => {
             })
         }
     }
-})
+  };
+};
 
-
-module.exports = controllers
+module.exports = controllers;
