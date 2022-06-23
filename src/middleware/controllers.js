@@ -5,11 +5,12 @@ const controllers = ((services) => {
             const serviceControllers = await services(req)
 
             if (!serviceControllers.success) throw serviceControllers;
-            if (serviceControllers.redirect) {
+
+            if (serviceControllers.link) {
                 return res.status(serviceControllers.statusCode || 200).json({
                     message: serviceControllers.message,
                     result: serviceControllers.data
-                }).redirect(serviceControllers.redirect)
+                }).redirect(serviceControllers.link)
             } else {
                 return res.status(serviceControllers.statusCode || 200).json({
                     message: serviceControllers.message,

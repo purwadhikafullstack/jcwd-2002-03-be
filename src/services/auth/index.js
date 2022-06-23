@@ -10,7 +10,6 @@ const { nanoid } = require('nanoid');
 const moment = require("moment");
 const { OAuth2Client } = require("google-auth-library")
 const client = new OAuth2Client(process.env.CLIENT_ID)
-const { generateToken } = require("../../lib/jwt")
 
 class authService extends Service {
     static register = async (req) => {
@@ -133,7 +132,6 @@ class authService extends Service {
             return this.handleError({})
         }
     }
-
     static adminRegister = async (req) => {
         try {
             const { name, email, password } = req.body;
@@ -218,7 +216,6 @@ class authService extends Service {
             });
 
             const user = { ...findAdmin.dataValues, role: "admin" }
-            // const data = { ...findAdmin, token }
             return this.handleSuccess({
                 message: "login admin success",
                 statusCode: 200,
