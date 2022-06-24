@@ -1,9 +1,6 @@
 const Service = require("../service");
-const {
-  User,
-  ForgotPasswordToken,
-  VerificationToken,
-} = require("../../lib/sequelize");
+const { User, ForgotPasswordToken, VerificationToken, Admin } = require("../../lib/sequelize");
+const { generateToken } = require("../../lib/jwt")
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const mustache = require("mustache");
@@ -11,19 +8,31 @@ const fs = require("fs");
 const mailer = require("../../lib/mailer");
 const { nanoid } = require("nanoid");
 const moment = require("moment");
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(process.env.CLIENT_ID);
-const { generateToken } = require("../../lib/jwt");
+const { OAuth2Client } = require("google-auth-library")
+const client = new OAuth2Client(process.env.CLIENT_ID)
 
 class authService extends Service {
   static register = async (req) => {
     try {
       const { name, email, password } = req.body;
 
+      const checkEmailAdmin = await Admin.findOne({
+        where: {
+          email
+        }
+      })
+
+      if (checkEmailAdmin) {
+        return this.handleError({
+          message: "email address not alowed to register, try another email address",
+          statusCode: 404
+        })
+      }
+
       const availableEmail = await User.findOne({
         where: {
-          email,
-        },
+          email
+        }
       });
 
       if (availableEmail) {
@@ -76,7 +85,7 @@ class authService extends Service {
     } catch (err) {
       console.log(err);
 
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -97,10 +106,10 @@ class authService extends Service {
       });
 
       if (!findToken) {
-        this.handleError({
+        return this.handleError({
           message: "your token is invalid",
-          statusCode: "404",
-        });
+          statusCode: "404"
+        })
       }
 
       await User.update(
@@ -116,15 +125,114 @@ class authService extends Service {
       findToken.save();
 
       return this.handleSuccess({
-        message: "email address verified",
+        message: "verify success",
+        redirect: `http://localhost:3000/verification`
+      })
+    } catch (err) {
+      console.log(err);
+      return this.handleError({})
+    }
+  }
+  static adminRegister = async (req) => {
+    try {
+      const { name, email, password } = req.body;
+
+      const checkEmailUser = await User.findOne({
+        where: {
+          email
+        }
+      });
+
+      if (checkEmailUser) {
+        return this.handleError({
+          message: "This email has been registered as user account, email used by the user cannot be used by the admin",
+          statusCode: 400,
+        });
+      }
+
+      const checkEmailAdmin = await Admin.findOne({
+        where: {
+          email
+        }
+      });
+
+      if (checkEmailAdmin) {
+        return this.handleError({
+          message: "This email has been registered, if you forget your password, you can reset your password",
+          statusCode: 400,
+        });
+      }
+
+      const hashedPassword = bcrypt.hashSync(password, 5);
+      const newAdmin = await Admin.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: "admin"
+      });
+
+      return this.handleSuccess({
+        message: "your account was created successfully",
         statusCode: 201,
-        redirect: `http://localhost:3000/verification`,
+        data: newAdmin,
       });
     } catch (err) {
       console.log(err);
-      this.handleError({});
+
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
     }
   };
+  static adminLogin = async (req) => {
+    try {
+      const { email, password } = req.body
+
+      const findAdmin = await Admin.findOne({
+        where: {
+          email
+        }
+      })
+
+      if (!findAdmin) {
+        return this.handleError({
+          message: "wrong email address",
+          statusCode: 400
+        })
+      }
+
+      const isPasswordCorrect = bcrypt.compareSync(password, findAdmin.password);
+
+      if (!isPasswordCorrect) {
+        return this.handleError({
+          message: "Wrong Password",
+          statusCode: 400
+        })
+      }
+
+      delete findAdmin.dataValues.password
+
+      const token = generateToken({
+        id: findAdmin.id
+      });
+
+      console.log(findAdmin.dataValues)
+      return this.handleSuccess({
+        message: "login admin success",
+        statusCode: 200,
+        data: {
+          user: findAdmin,
+          token,
+        },
+      })
+
+    } catch (err) {
+      console.log(err)
+      return this.handleError({})
+
+    }
+  }
   static login = async (req) => {
     try {
       // const { name, password } = req.body;
