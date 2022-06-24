@@ -4,7 +4,6 @@ const controllers = (services) => {
       const serviceControllers = await services(req);
 
       if (!serviceControllers.success) throw serviceControllers;
-      console.log(serviceControllers.success)
       return res.status(serviceControllers.statusCode || 200).json({
         message: serviceControllers.message,
         result: serviceControllers.data,

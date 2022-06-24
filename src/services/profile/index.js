@@ -1,6 +1,7 @@
 const Service = require("../service");
 const { User } = require("../../lib/sequelize");
 class profileService extends Service {
+  // npx nodemon . --inspect
   static getMyProfile = async (req) => {
     try {
       const findMyProfile = await User.findOne({
@@ -38,7 +39,7 @@ class profileService extends Service {
           statusCode: 400,
         });
       }
-      const updatedMyName = await User.update(
+      await User.update(
         {
           name: username,
         },
@@ -48,10 +49,16 @@ class profileService extends Service {
           },
         }
       );
+      const name = await User.findOne({
+        where: {
+          id: 1,
+        },
+        attributes: ["name"],
+      });
       return this.handleSuccess({
         message: "your name was changed successfully",
         statusCode: 201,
-        data: updatedMyName,
+        data: name,
       });
     } catch (err) {
       console.log(err);
@@ -64,10 +71,16 @@ class profileService extends Service {
   static tambahTl = async (req) => {
     try {
       const { birthdate } = req.body;
-
-      const userBirthdate = await User.create({
-        birthdate,
-      });
+      const userBirthdate = await User.update(
+        {
+          birthDate: birthdate,
+        },
+        {
+          where: {
+            id: 1,
+          },
+        }
+      );
       return this.handleSuccess({
         message: "your birthdate was added successfully",
         statusCode: 201,
@@ -115,10 +128,10 @@ class profileService extends Service {
       const filePath = `profile-pictures`;
       const { filename } = req.file;
 
-      const updatedMyProfile = await User.update(
+      await User.update(
         {
           ...req.body,
-          profile_picture: `${uploadFileDomain}/${filePath}/${filename}`,
+          image_url: `${uploadFileDomain}/${filePath}/${filename}`,
         },
         {
           where: {
@@ -126,12 +139,18 @@ class profileService extends Service {
           },
         }
       );
+      const imageUrl = await User.findOne({
+        where: {
+          id: 1,
+        },
+        attributes: ["image_url"],
+      });
       return this.handleSuccess({
         message: "your profile picture was created successfully",
         statusCode: 201,
-        data: updatedMyProfile,
+        data: imageUrl,
       });
-    } catch (error) {
+    } catch (err) {
       console.log(err);
       this.handleError({
         message: "Server Error",
