@@ -124,10 +124,9 @@ class authService extends Service {
       findToken.is_valid = false;
       findToken.save();
 
-      return this.handleRedirect({
-        message: "email address verified",
-        statusCode: 201,
-        link: `http://localhost:3000/verification`
+      return this.handleSuccess({
+        message: "verify success",
+        redirect: `http://localhost:3000/verification`
       })
     } catch (err) {
       console.log(err);
@@ -234,50 +233,6 @@ class authService extends Service {
 
     }
   }
-
-  static verifyEmail = async (req) => {
-    try {
-      const { token } = req.params;
-
-      const findToken = await VerificationToken.findOne({
-        where: {
-          token,
-          is_valid: true,
-          valid_until: {
-            [Op.gt]: moment().utc(),
-          },
-        },
-      });
-
-      if (!findToken) {
-        this.handleError({
-          message: "your token is invalid",
-          statusCode: "404",
-        });
-      }
-
-      await User.update(
-        { is_verified: true },
-        {
-          where: {
-            id: findToken.UserId,
-          },
-        }
-      );
-
-      findToken.is_valid = false;
-      findToken.save();
-
-      return this.handleSuccess({
-        message: "email address verified",
-        statusCode: 201,
-        redirect: `http://localhost:3000/verification`,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({});
-    }
-  };
   static login = async (req) => {
     try {
       // const { name, password } = req.body;
