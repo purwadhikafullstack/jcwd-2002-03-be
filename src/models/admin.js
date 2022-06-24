@@ -14,6 +14,10 @@ const Admin = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     });
 };
 
