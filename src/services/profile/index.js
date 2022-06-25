@@ -1,5 +1,5 @@
 const Service = require("../service");
-const { User } = require("../../lib/sequelize");
+const { User, Address } = require("../../lib/sequelize");
 class profileService extends Service {
   // npx nodemon . --inspect
   static getMyProfile = async (req) => {
@@ -149,6 +149,105 @@ class profileService extends Service {
         message: "your profile picture was created successfully",
         statusCode: 201,
         data: imageUrl,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static tambahAlamat = async (req) => {
+    try {
+      const {
+        labelAlamat,
+        nama,
+        nomorHp,
+        provinsi,
+        kotaKabupaten,
+        kecamatan,
+        alamat,
+        kodePos,
+        UserId,
+      } = req.body;
+      const address = await Address.create({
+        labelAlamat,
+        nama,
+        nomorHp,
+        provinsi,
+        kotaKabupaten,
+        kecamatan,
+        alamat,
+        kodePos,
+        UserId,
+      });
+      return this.handleSuccess({
+        message: "your address was added successfully",
+        statusCode: 201,
+        data: address,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static tambahNomorHp = async (req) => {
+    try {
+      const { phone } = req.body;
+      const userPhone = await User.update(
+        {
+          phone,
+        },
+        {
+          where: {
+            id: 1,
+          },
+        }
+      );
+      return this.handleSuccess({
+        message: "your phone number was created successfully",
+        statusCode: 201,
+        data: userPhone,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static getAddress = async (req) => {
+    try {
+      const address = await User.findAndCountAll({
+        where: {
+          id: 1,
+        },
+        include: [
+          {
+            model: Address,
+            attributes: [
+              "labelAlamat",
+              "nama",
+              "nomorHp",
+              "provinsi",
+              "kotaKabupaten",
+              "kecamatan",
+              "alamat",
+              "kodePos",
+              "id",
+            ],
+          },
+        ],
+      });
+      return this.handleSuccess({
+        message: "your address was added successfully",
+        statusCode: 201,
+        data: address.rows,
       });
     } catch (err) {
       console.log(err);

@@ -1,30 +1,46 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 const Address = (sequelize) => {
-    return sequelize.define('Address', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-            allowNull: false,
-        },
-        province: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        city: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        kecematan: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        postal_code: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-    });
+  return sequelize.define("Address", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
+    },
+    provinsi: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    kotaKabupaten: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    kecamatan: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    kodePos: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    nama: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    labelAlamat: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    nomorHp: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    alamat: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  });
 };
 
 module.exports = Address;

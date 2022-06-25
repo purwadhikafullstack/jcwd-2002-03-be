@@ -12,8 +12,11 @@ router.post(
   }).single("update_image_file"),
   controllers(profileService.editProfilePicture)
 );
+router.post("/tambahAl", controllers(profileService.tambahAlamat));
+router.post("/tambahNomorHp", controllers(profileService.tambahNomorHp));
 router.post("/tambahJk", controllers(profileService.tambahJk));
 router.post("/tambahTl", controllers(profileService.tambahTl));
 router.get("/", controllers(profileService.getMyProfile));
+router.get("/address", controllers(profileService.getAddress));
 
 module.exports = router;
