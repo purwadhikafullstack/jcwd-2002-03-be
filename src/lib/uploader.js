@@ -2,7 +2,7 @@ const multer = require("multer");
 const { nanoid } = require("nanoid");
 
 const fileUploader = ({
-  destinationFolder = "posts",
+  destinationFolder = "profile_pictures",
   prefix = "POST",
   fileType = "image",
 }) => {
