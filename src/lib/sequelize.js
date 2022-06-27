@@ -76,7 +76,7 @@ Product.hasMany(Inventory)
 Inventory.belongsTo(Transaction)
 Transaction.hasMany(Inventory)
 
-Category.belongsToMany(Product, { through: "product_category" })
+Category.hasMany(Product)
 module.exports = {
     Address,
     Admin,
@@ -85,6 +85,7 @@ module.exports = {
     Category,
     Inventory,
     Product,
+    Product_image,
     User,
     sequelize,
     Stock_order,
