@@ -37,10 +37,7 @@ class productService extends Service {
       return this.handleSuccess({
         message: "Products found",
         statusCode: 200,
-        data: {
-          result: findProducts,
-          meta: {page: _page, limit:_limit, count: findProducts.count, totalPages: Math.ceil(findProducts.count / _limit)}
-        }
+        data: findProducts,
       });
     } catch (err) {
       console.log(err);
