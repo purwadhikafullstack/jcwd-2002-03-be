@@ -9,12 +9,10 @@ const controllers = (services) => {
         return res.redirect(serviceControllers.redirect);
       }
 
-      return res
-        .status(serviceControllers.statusCode || 200)
-        .json({
-          message: serviceControllers.message,
-          result: serviceControllers.data,
-        })
+      return res.status(serviceControllers.statusCode || 200).json({
+        message: serviceControllers.message,
+        result: serviceControllers.data,
+      });
     } catch (err) {
       console.log(err);
       return res.status(err.statusCode).json({
