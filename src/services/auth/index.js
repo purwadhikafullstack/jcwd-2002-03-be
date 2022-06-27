@@ -59,7 +59,7 @@ class authService extends Service {
         is_valid: true,
       });
 
-      const verificationLink = `${process.env.BASE_url}/auth/verify/${verificationToken}`;
+      const verificationLink = `${process.env.BASE_URL}/auth/verify/${verificationToken}`;
 
       const template = fs
         .readFileSync(__dirname + "/../../templates/verify-template.html")
