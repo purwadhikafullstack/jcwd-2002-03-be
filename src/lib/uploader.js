@@ -22,7 +22,8 @@ const fileUploader = ({
 
   const uploader = multer({
     storage,
-    dest: `${__dirname}/../public/posts`,
+    dest: `${__dirname}/../public/${destinationFolder}`,
+    // update code dest from alfredo
     fileFilter: (req, file, cb) => {
       if (file.mimetype.split("/")[0] !== fileType) {
         return cb(null, false);

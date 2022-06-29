@@ -15,7 +15,6 @@ const Admin = require("../models/admin")(sequelize)
 const Address = require("../models/address")(sequelize)
 const Buy_stock = require("../models/buy_stock")(sequelize)
 const Cart = require("../models/cart")(sequelize)
-const Category = require("../models/categories")(sequelize)
 const Inventory = require("../models/inventory")(sequelize)
 const Product = require("../models/product")(sequelize)
 const User = require("../models/user")(sequelize)
@@ -58,8 +57,8 @@ User.hasMany(ForgotPasswordToken);
 
 Stock_order.belongsTo(Product)
 Product.hasMany(Stock_order)
-// Stock_order.belongsTo(Admin)
-// Admin.hasMany(Stock_order)
+Stock_order.belongsTo(Admin)
+Admin.hasMany(Stock_order)
 
 Payment.belongsTo(Admin)
 Admin.hasMany(Payment)
@@ -76,13 +75,11 @@ Product.hasMany(Inventory)
 Inventory.belongsTo(Transaction)
 Transaction.hasMany(Inventory)
 
-Category.hasMany(Product)
 module.exports = {
     Address,
     Admin,
     Buy_stock,
     Cart,
-    Category,
     Inventory,
     Product,
     Product_image,
