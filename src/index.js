@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const PORT = process.env.PORT;
 const { sequelize } = require("./lib/sequelize");
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 const app = express();
 
