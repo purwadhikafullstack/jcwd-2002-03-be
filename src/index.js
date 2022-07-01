@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const PORT = process.env.PORT;
 const { sequelize } = require("./lib/sequelize");
-sequelize.sync();
+sequelize.sync({ alter: true });
 
 const app = express();
 
@@ -29,9 +29,7 @@ app.use(
   "/profile-pictures",
   express.static(`${__dirname}/public/profile_pictures`)
 );
-app.use(
-  "product", express.static(`$(__dirname)/public/product`)
-)
+app.use("product", express.static(`$(__dirname)/public/product`));
 
 app.listen(PORT, () => {
   console.log("Listening in PORT", PORT);
