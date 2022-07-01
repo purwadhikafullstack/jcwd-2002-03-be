@@ -4,61 +4,43 @@ const Product = (sequelize) => {
   return sequelize.define("Product", {
     id: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       primaryKey: true,
       autoIncrement: true,
-      allowNull: false,
     },
     med_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    nomor_med: {
-      type: DataTypes.INTEGER,
+    nomer_med: {
+      type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
-    nomor_bpom: {
-      type: DataTypes.INTEGER,
+    nomer_bpom: {
+      type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     selling_price: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    buying_price: {
-      type: DataTypes.INTEGER,
+    kemasan: {
+      type: DataTypes.STRING,
       allowNull: false,
-    },
-    discount: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
     },
     indikasi: {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    discount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
     kandungan: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    kemasan: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    resep: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
-    penyimpanan: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    principal: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    NIE: {
-      type: DataTypes.STRING,
-      allowNull: false,
     },
   });
 };
