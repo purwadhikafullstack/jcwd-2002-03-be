@@ -7,10 +7,14 @@ const { validator, addProductValidation } = require("../middleware/validator/val
 router.get("/", controllers(productService.getProduct));
 router.get("/:id", controllers(productService.getProductById))
 router.post("/newProduct", addProductValidation, validator, controllers(productService.addProduct))
-router.post("/images/upload/:id", fileUploader({
-    destinationFolder: "product", fileType: "image", prefix: "POST"
-}).array("product_images", 5), controllers(productService.addProductImage))
+router.post("/images/upload/:id",
+    fileUploader({
+        destinationFolder: "products",
+        fileType: "image",
+        prefix: "POST"
+    }).array("product_images"), controllers(productService.addProductImage))
 router.delete("/delete/:id", controllers(productService.deleteProduct))
-router.get("/category", controllers(productService.getProductCategory));
+router.delete("/:ProductId/images/:id", controllers(productService.deleteProductImage))
+router.patch("/:id/update-data", controllers(productService.updateProduct))
 
 module.exports = router;

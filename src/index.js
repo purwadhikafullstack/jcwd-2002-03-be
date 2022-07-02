@@ -18,6 +18,7 @@ const {
   inventoryRoutes,
   profileRoutes,
   productRoutes,
+  categoryRoutes
 } = require("./routes");
 
 app.use("/auth", authRoutes);
@@ -25,11 +26,14 @@ app.use("/transaction", transactionRoutes);
 app.use("/inventory", inventoryRoutes);
 app.use("/profile", profileRoutes);
 app.use("/product", productRoutes);
+app.use("/category", categoryRoutes)
 app.use(
   "/profile-pictures",
   express.static(`${__dirname}/public/profile_pictures`)
 );
-app.use("product", express.static(`$(__dirname)/public/product`));
+app.use(
+  "/products", express.static(`${__dirname}/public/products`)
+)
 
 app.listen(PORT, () => {
   console.log("Listening in PORT", PORT);

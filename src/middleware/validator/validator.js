@@ -20,12 +20,13 @@ exports.adminValidation = [
 ]
 exports.addProductValidation = [
     check("med_name").notEmpty().withMessage("med_name required"),
-    check("no_med").notEmpty().withMessage("nomer_med required"),
-    check("no_bpom").notEmpty().withMessage("nomer_bpom required"),
+    check("nomer_med").notEmpty().withMessage("nomer_med required"),
+    check("nomer_bpom").notEmpty().withMessage("nomer_bpom required"),
     check("selling_price").notEmpty().withMessage("selling_price required").isNumeric().withMessage("input number"),
     check("discount").isFloat().withMessage("input discount in decimal"),
-    check("category").notEmpty().withMessage("category required").isBoolean().withMessage("input with boolean 0 for obat resep, 1 for obat bebas"),
-    check("kemasan").notEmpty().withMessage("jenis kemasan require")
+    check("categoryId").notEmpty().withMessage("category required"),
+    check("kemasan").notEmpty().withMessage("jenis kemasan require"),
+    check("kandungan").notEmpty().withMessage("jenis kemasan require")
 ]
 
 exports.validator = (req, res, next) => {
