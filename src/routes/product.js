@@ -5,6 +5,7 @@ const productService = require("../services/product");
 const { validator, addProductValidation } = require("../middleware/validator/validator")
 
 router.get("/", controllers(productService.getProduct));
+router.get("/:id", controllers(productService.getProductById))
 router.post("/newProduct", addProductValidation, validator, controllers(productService.addProduct))
 router.post("/images/upload/:id", fileUploader({
     destinationFolder: "product", fileType: "image", prefix: "POST"
