@@ -319,7 +319,6 @@ class productService extends Service {
           ProductId: id,
         }, attributes: ["id", "image_url"]
       })
-      console.log(updateData)
       return this.handleSuccess({
         message: "upload success",
         statusCode: 201,
