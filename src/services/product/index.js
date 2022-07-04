@@ -373,6 +373,7 @@ class productService extends Service {
     }
   }
   static updateProduct = async (req) => {
+
     try {
       const { id } = req.params
       const {
