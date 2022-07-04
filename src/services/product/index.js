@@ -385,7 +385,6 @@ class productService extends Service {
         kandungan,
         kemasan,
         categoryId } = req.body
-      console.log(req.body)
 
       const checkDuplicate = await Product.findOne({
         where: {
