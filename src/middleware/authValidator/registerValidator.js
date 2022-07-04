@@ -18,16 +18,6 @@ exports.adminValidation = [
         .matches(/^(?=.*?[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W)(?!.*[._]).{8,}$/)
         .withMessage("Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character")
 ]
-exports.addProductValidation = [
-    check("med_name").notEmpty().withMessage("med_name required"),
-    check("nomer_med").notEmpty().withMessage("nomer_med required"),
-    check("nomer_bpom").notEmpty().withMessage("nomer_bpom required"),
-    check("selling_price").notEmpty().withMessage("selling_price required").isNumeric().withMessage("input number"),
-    check("discount").isFloat().withMessage("input discount in decimal"),
-    check("categoryId").notEmpty().withMessage("category required"),
-    check("kemasan").notEmpty().withMessage("jenis kemasan require"),
-    check("kandungan").notEmpty().withMessage("jenis kemasan require")
-]
 
 exports.validator = (req, res, next) => {
     const result = validationResult(req).array()

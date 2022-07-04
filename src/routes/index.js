@@ -3,11 +3,13 @@ const transactionRoutes = require("./transaction")
 const inventoryRoutes = require("./inventory")
 const profileRoutes = require("./profile")
 const productRoutes = require("./product")
+const categoryRoutes = require("./category")
 
 module.exports = {
     authRoutes,
     transactionRoutes,
     inventoryRoutes,
     profileRoutes,
-    productRoutes
+    productRoutes,
+    categoryRoutes
 }

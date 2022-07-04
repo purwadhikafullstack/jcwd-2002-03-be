@@ -8,7 +8,7 @@ const User = (sequelize) => {
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         },
         email: {
             type: DataTypes.STRING,
