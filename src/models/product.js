@@ -4,9 +4,9 @@ const Product = (sequelize) => {
   return sequelize.define("Product", {
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false,
     },
     med_name: {
       type: DataTypes.STRING,

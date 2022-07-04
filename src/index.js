@@ -29,9 +29,7 @@ app.use(
   "/profile-pictures",
   express.static(`${__dirname}/public/profile_pictures`)
 );
-app.use(
-  "product", express.static(`$(__dirname)/public/product`)
-)
+app.use("product", express.static(`$(__dirname)/public/product`));
 
 app.listen(PORT, () => {
   console.log("Listening in PORT", PORT);
