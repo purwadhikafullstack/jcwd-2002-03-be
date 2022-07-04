@@ -12,6 +12,8 @@ class productService extends Service {
         _page = 1,
         priceMin,
         priceMax,
+        selectedProduct,
+        searchProduct,
       } = req.query;
       delete req.query._limit;
       delete req.query._page;
@@ -19,17 +21,37 @@ class productService extends Service {
       delete req.query._sortDir;
       delete req.query.priceMin;
       delete req.query.priceMax;
+      delete req.query.selectedProduct;
+      delete req.query.searchProduct;
+
+      let whereCategoryClause = {};
+      let searchByNameClause = {};
+
+      if (selectedProduct) {
+        whereCategoryClause.categoryId = selectedProduct;
+      }
+
+      if (searchProduct) {
+        searchByNameClause = {
+          med_name: { [Op.like]: `%${searchProduct}%` },
+        };
+      }
+
       const findProducts = await Product.findAndCountAll({
         where: {
           ...req.query,
           // med_name: {[Op.like]: `%${req.query.med_name}%`}
+          selling_price: {
+            [Op.between]: [priceMin || 0, priceMax || 999999999],
+          },
+          ...searchByNameClause,
+          ...whereCategoryClause,
         },
-        selling_price: {
-          [Op.between]: [priceMin || 0, priceMax || 999999999],
-        },
+
         limit: _limit ? parseInt(_limit) : undefined,
         offset: (_page - 1) * _limit,
         order: _sortBy ? [[_sortBy, _sortDir]] : undefined,
+        distinct: true,
         include: [
           {
             model: Product_image,
@@ -86,7 +108,97 @@ class productService extends Service {
       });
     }
   };
-  static addProduct = async (req) => {
+  static tambahTl = async (req) => {
+    try {
+      const { birthdate } = req.body;
+      const userBirthdate = await User.update(
+        {
+          birthDate: birthdate,
+        },
+        {
+          where: {
+            id: 1,
+          },
+        }
+      );
+      return this.handleSuccess({
+        message: "your birthdate was added successfully",
+        statusCode: 201,
+        data: userBirthdate,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static tambahJk = async (req) => {
+    try {
+      const { gender } = req.body;
+      console.log(gender);
+      const userGender = await User.update(
+        {
+          gender,
+        },
+        {
+          where: {
+            id: 1,
+          },
+        }
+      );
+
+      return this.handleSuccess({
+        message: "your gender was added successfully",
+        statusCode: 201,
+        data: userGender,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static editProfilePicture = async (req) => {
+    try {
+      const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
+      const filePath = `profile-pictures`;
+      const { filename } = req.file;
+
+      await User.update(
+        {
+          ...req.body,
+          image_url: `${uploadFileDomain}/${filePath}/${filename}`,
+        },
+        {
+          where: {
+            id: 1,
+          },
+        }
+      );
+      const imageUrl = await User.findOne({
+        where: {
+          id: 1,
+        },
+        attributes: ["image_url"],
+      });
+      return this.handleSuccess({
+        message: "your profile picture was created successfully",
+        statusCode: 201,
+        data: imageUrl,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static tambahAlamat = async (req) => {
     try {
       const {
         med_name,
@@ -151,7 +263,7 @@ class productService extends Service {
       });
 
       return this.handleSuccess({
-        message: "add new product success",
+        message: "your address was added successfully",
         statusCode: 201,
         data: inputProduct,
       });
@@ -213,14 +325,18 @@ class productService extends Service {
       });
 
       return this.handleSuccess({
-        message: "delete product success",
+        message: "Get category",
         statusCode: 200,
+        data: findCategory,
       });
     } catch (err) {
       console.log(err);
-      return this.handleError({});
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
     }
   };
 }
-
 module.exports = productService;

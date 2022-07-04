@@ -77,20 +77,21 @@ Product.hasMany(Inventory);
 Inventory.belongsTo(Transaction);
 Transaction.hasMany(Inventory);
 
+Category.hasMany(Product)
 module.exports = {
-  Address,
-  Admin,
-  Buy_stock,
-  Category,
-  Cart,
-  Inventory,
-  Product,
-  Product_image,
-  User,
-  sequelize,
-  Stock_order,
-  Stock_opname,
-  Stock_sold,
-  VerificationToken,
-  ForgotPasswordToken,
-};
+    Address,
+    Admin,
+    Buy_stock,
+    Cart,
+    Category,
+    Inventory,
+    Product,
+    Product_image,
+    User,
+    sequelize,
+    Stock_order,
+    Stock_opname,
+    Stock_sold,
+    VerificationToken,
+    ForgotPasswordToken
+}

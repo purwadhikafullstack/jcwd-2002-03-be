@@ -11,5 +11,6 @@ router.post("/images/upload/:id", fileUploader({
     destinationFolder: "product", fileType: "image", prefix: "POST"
 }).array("product_images", 5), controllers(productService.addProductImage))
 router.delete("/delete/:id", controllers(productService.deleteProduct))
+router.get("/category", controllers(productService.getProductCategory));
 
 module.exports = router;
