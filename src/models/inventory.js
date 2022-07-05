@@ -7,8 +7,7 @@ const Inventory = (sequelize) => {
             allowNull: true,
             primaryKey: true,
             autoIncrement: true,
-            // productId
-            // transactionId
+            // adminId
         },
         quantity: {
             type: DataTypes.INTEGER,
@@ -17,8 +16,7 @@ const Inventory = (sequelize) => {
         expired_date: {
             type: DataTypes.DATE,
             allowNull: false
-        }
-        ,
+        },
         type: {
             type: DataTypes.STRING,
             allowNull: true,

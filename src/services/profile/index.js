@@ -169,8 +169,8 @@ class profileService extends Service {
         kecamatan,
         alamat,
         kodePos,
-        UserId,
       } = req.body;
+      const { UserId } = req.token.id
       const address = await Address.create({
         labelAlamat,
         nama,
@@ -204,7 +204,7 @@ class profileService extends Service {
         },
         {
           where: {
-            id: 1,
+            id: req.token.id
           },
         }
       );
@@ -225,7 +225,7 @@ class profileService extends Service {
     try {
       const address = await User.findAndCountAll({
         where: {
-          id: 1,
+          id: req.token.id
         },
         include: [
           {

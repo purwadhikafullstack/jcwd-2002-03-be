@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const fileUploader = require("../lib/uploader");
-const controllers = require("../middleware/controllers");
+const { authorizedToken } = require("../middlewares/authMiddleware");
+const controllers = require("../middlewares/controllers");
 const profileService = require("../services/profile");
 router.post("/edit-nama", controllers(profileService.editNama));
 router.post(
@@ -17,6 +18,6 @@ router.post("/tambahNomorHp", controllers(profileService.tambahNomorHp));
 router.post("/tambahJk", controllers(profileService.tambahJk));
 router.post("/tambahTl", controllers(profileService.tambahTl));
 router.get("/", controllers(profileService.getMyProfile));
-router.get("/address", controllers(profileService.getAddress));
+router.get("/address", authorizedToken, controllers(profileService.getAddress));
 
 module.exports = router;
