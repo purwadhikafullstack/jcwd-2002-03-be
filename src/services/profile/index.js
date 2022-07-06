@@ -161,19 +161,41 @@ class profileService extends Service {
   static tambahAlamat = async (req) => {
     try {
       const {
+        namaBelakang,
         labelAlamat,
-        nama,
+        namaDepan,
         nomorHp,
         provinsi,
         kotaKabupaten,
         kecamatan,
         alamat,
         kodePos,
+        main_address
       } = req.body;
-      const { UserId } = req.token.id
+      const UserId = req.token.id
+      console.log(UserId)
+
+
+      if (main_address === true) {
+        // function to check if user already set main_address , in other addres id
+        const checkMainAddress = await Address.findAll({
+          where: {
+            UserId,
+            main_address: true
+          }
+        })
+
+        // if userAlready set main_address in other address id, then turn it into false
+        if (checkMainAddress.length !== 0) {
+          await Address.update({
+            main_address: false
+          }, { where: { id: checkMainAddress[0].dataValues.id } })
+        }
+      }
+
       const address = await Address.create({
         labelAlamat,
-        nama,
+        nama: `${namaDepan} ${namaBelakang}`,
         nomorHp,
         provinsi,
         kotaKabupaten,
@@ -181,6 +203,7 @@ class profileService extends Service {
         alamat,
         kodePos,
         UserId,
+        main_address
       });
       return this.handleSuccess({
         message: "your address was added successfully",
@@ -255,6 +278,27 @@ class profileService extends Service {
         message: "Server Error",
         statusCode: 500,
       });
+    }
+  };
+  static getAddressByUserId = async (req) => {
+    try {
+      const findAddress = await Address.findAll({
+        where: {
+          UserId: req.token.id,
+          // main_address: true
+        }
+      })
+
+      return this.handleSuccess({
+        message: "get address by user id success",
+        statusCode: 200,
+        data: findAddress
+      })
+
+    } catch (err) {
+      console.log(err)
+      return this.handleError({})
+
     }
   };
 }

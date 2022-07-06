@@ -5,7 +5,6 @@ const authorizedToken = (req, res, next) => {
         const token = req.headers.authorization
 
         const verifiedToken = verifyToken(token)
-        console.log(verifiedToken)
         req.token = verifiedToken
 
         next()

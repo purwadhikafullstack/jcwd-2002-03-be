@@ -249,9 +249,8 @@ class productService extends Service {
       });
 
       return this.handleSuccess({
-        message: "Get category",
+        message: "delete product success",
         statusCode: 200,
-        data: findCategory,
       });
     } catch (err) {
       console.log(err);
