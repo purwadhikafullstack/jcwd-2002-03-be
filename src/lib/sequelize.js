@@ -76,6 +76,8 @@ Inventory.belongsTo(Product);
 Product.hasMany(Inventory);
 Inventory.belongsTo(Transaction);
 Transaction.hasMany(Inventory);
+Inventory.belongsTo(Admin)
+Admin.hasMany(Inventory)
 
 Category.hasMany(Product)
 module.exports = {

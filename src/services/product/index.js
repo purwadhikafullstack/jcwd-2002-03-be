@@ -1,5 +1,5 @@
 const Service = require("../service");
-const { Product, Product_image, Category } = require("../../lib/sequelize");
+const { Product, Product_image, Category, Stock_opname, Inventory } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 class productService extends Service {
   // npx nodemon . --inspect
@@ -62,6 +62,13 @@ class productService extends Service {
             attributes: ["category_name", "id"],
             where: req.query?.categoryId ? { id: req.query.categoryId } : {},
           },
+          {
+            model: Stock_opname,
+            attributes: ["amount"],
+          },
+          {
+            model: Inventory
+          }
         ],
       });
       console.log(findProducts);
@@ -338,21 +345,14 @@ class productService extends Service {
           id,
         },
       });
-
-      return this.handleSuccess({
-        message: "Get category",
-        statusCode: 200,
-        data: findCategory,
-      });
     } catch (err) {
-      console.log(err);
       console.log(err);
       this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
     }
-  }
+  };
   static deleteProductImage = async (req) => {
     try {
       const { ProductId, id } = req.params
