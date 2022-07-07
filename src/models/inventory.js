@@ -24,7 +24,7 @@ const Inventory = (sequelize) => {
     },
     buying_price: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
   });
 };
