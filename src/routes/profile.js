@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const fileUploader = require("../lib/uploader");
-const controllers = require("../middleware/controllers");
+const { authorizedToken } = require("../middlewares/authMiddleware");
+const controllers = require("../middlewares/controllers");
 const profileService = require("../services/profile");
 router.post("/edit-nama", controllers(profileService.editNama));
 router.post(
@@ -12,11 +13,12 @@ router.post(
   }).single("update_image_file"),
   controllers(profileService.editProfilePicture)
 );
-router.post("/tambahAl", controllers(profileService.tambahAlamat));
+router.post("/tambahAl", authorizedToken, controllers(profileService.tambahAlamat));
 router.post("/tambahNomorHp", controllers(profileService.tambahNomorHp));
 router.post("/tambahJk", controllers(profileService.tambahJk));
 router.post("/tambahTl", controllers(profileService.tambahTl));
 router.get("/", controllers(profileService.getMyProfile));
-router.get("/address", controllers(profileService.getAddress));
+router.get("/address", authorizedToken, controllers(profileService.getAddress));
+router.get("/address-user", authorizedToken, controllers(profileService.getAddressByUserId));
 
 module.exports = router;

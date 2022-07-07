@@ -18,7 +18,8 @@ const {
   inventoryRoutes,
   profileRoutes,
   productRoutes,
-  categoryRoutes
+  categoryRoutes,
+  paymentRoutes
 } = require("./routes");
 
 app.use("/auth", authRoutes);
@@ -27,6 +28,7 @@ app.use("/inventory", inventoryRoutes);
 app.use("/profile", profileRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes)
+app.use("/payment", paymentRoutes)
 app.use(
   "/profile-pictures",
   express.static(`${__dirname}/public/profile_pictures`)

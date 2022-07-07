@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const fileUploader = require("../lib/uploader")
-const controllers = require("../middleware/controllers");
+const controllers = require("../middlewares/controllers");
 const productService = require("../services/product");
-const { validator, addProductValidation } = require("../middleware/validator/validator")
+const { validator, addProductValidation } = require("../middlewares/validator/validator")
 
 router.get("/", controllers(productService.getProduct));
 // router.get("/:id", controllers(productService.getProductById))

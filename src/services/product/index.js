@@ -71,7 +71,6 @@ class productService extends Service {
           }
         ],
       });
-      console.log(findProducts);
       return this.handleSuccess({
         message: "Products found",
         statusCode: 200,
@@ -115,97 +114,7 @@ class productService extends Service {
       });
     }
   };
-  static tambahTl = async (req) => {
-    try {
-      const { birthdate } = req.body;
-      const userBirthdate = await User.update(
-        {
-          birthDate: birthdate,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-      return this.handleSuccess({
-        message: "your birthdate was added successfully",
-        statusCode: 201,
-        data: userBirthdate,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static tambahJk = async (req) => {
-    try {
-      const { gender } = req.body;
-      console.log(gender);
-      const userGender = await User.update(
-        {
-          gender,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-
-      return this.handleSuccess({
-        message: "your gender was added successfully",
-        statusCode: 201,
-        data: userGender,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static editProfilePicture = async (req) => {
-    try {
-      const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
-      const filePath = `profile-pictures`;
-      const { filename } = req.file;
-
-      await User.update(
-        {
-          ...req.body,
-          image_url: `${uploadFileDomain}/${filePath}/${filename}`,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-      const imageUrl = await User.findOne({
-        where: {
-          id: 1,
-        },
-        attributes: ["image_url"],
-      });
-      return this.handleSuccess({
-        message: "your profile picture was created successfully",
-        statusCode: 201,
-        data: imageUrl,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static tambahAlamat = async (req) => {
+  static addProduct = async (req) => {
     try {
       const {
         med_name,
@@ -280,7 +189,7 @@ class productService extends Service {
       })
 
       return this.handleSuccess({
-        message: "your address was added successfully",
+        message: "new product Sucesss",
         statusCode: 201,
         data: result
       })
@@ -345,6 +254,12 @@ class productService extends Service {
           id,
         },
       });
+
+      return this.handleSuccess({
+        message: "delete product success",
+        statusCode: 200,
+      });
+
     } catch (err) {
       console.log(err);
       this.handleError({
