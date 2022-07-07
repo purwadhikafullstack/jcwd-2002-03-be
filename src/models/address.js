@@ -40,6 +40,10 @@ const Address = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    main_address: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   });
 };
 

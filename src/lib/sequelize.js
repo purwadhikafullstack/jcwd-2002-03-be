@@ -79,7 +79,6 @@ Transaction.hasMany(Inventory);
 Inventory.belongsTo(Admin)
 Admin.hasMany(Inventory)
 
-Category.hasMany(Product)
 module.exports = {
     Address,
     Admin,
