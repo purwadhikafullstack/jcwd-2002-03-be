@@ -8,6 +8,7 @@ const { sequelize } = require("./lib/sequelize");
 sequelize.sync({ alter: true });
 
 const app = express();
+const apiRoutes = require('./routes/api')
 
 app.use(cors());
 app.use(express.json());
@@ -38,6 +39,12 @@ app.use(
 app.use(
   "/products", express.static(`${__dirname}/public/products`)
 )
+app.use(
+  "/prescriptions", express.static(`${__dirname}/public/prescriptions`)
+)
+
+// for rajaongkir request dan response
+app.use('/api', apiRoutes)
 
 app.listen(PORT, () => {
   console.log("Listening in PORT", PORT);
