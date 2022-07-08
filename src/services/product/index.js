@@ -108,108 +108,18 @@ class productService extends Service {
       });
     }
   };
-  static tambahTl = async (req) => {
-    try {
-      const { birthdate } = req.body;
-      const userBirthdate = await User.update(
-        {
-          birthDate: birthdate,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-      return this.handleSuccess({
-        message: "your birthdate was added successfully",
-        statusCode: 201,
-        data: userBirthdate,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static tambahJk = async (req) => {
-    try {
-      const { gender } = req.body;
-      console.log(gender);
-      const userGender = await User.update(
-        {
-          gender,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-
-      return this.handleSuccess({
-        message: "your gender was added successfully",
-        statusCode: 201,
-        data: userGender,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static editProfilePicture = async (req) => {
-    try {
-      const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
-      const filePath = `profile-pictures`;
-      const { filename } = req.file;
-
-      await User.update(
-        {
-          ...req.body,
-          image_url: `${uploadFileDomain}/${filePath}/${filename}`,
-        },
-        {
-          where: {
-            id: 1,
-          },
-        }
-      );
-      const imageUrl = await User.findOne({
-        where: {
-          id: 1,
-        },
-        attributes: ["image_url"],
-      });
-      return this.handleSuccess({
-        message: "your profile picture was created successfully",
-        statusCode: 201,
-        data: imageUrl,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
-  static tambahAlamat = async (req) => {
+  static addProduct = async (req) => {
     try {
       const {
         med_name,
-        no_med,
-        no_bpom,
+        nomor_med,
+        nomor_bpom,
         selling_price,
         discount,
         indikasi,
         kandungan,
         kemasan,
-        category,
+        categoryId,
       } = req.body;
 
       const checkNameRegister = await Product.findOne({
@@ -227,7 +137,7 @@ class productService extends Service {
 
       const checkNoMedRegister = await Product.findOne({
         where: {
-          no_med,
+          nomor_med,
         },
       });
 
@@ -239,7 +149,7 @@ class productService extends Service {
       }
       const checkBpomRegister = await Product.findOne({
         where: {
-          no_med,
+          nomor_bpom,
         },
       });
 
@@ -252,14 +162,14 @@ class productService extends Service {
 
       const inputProduct = await Product.create({
         med_name,
-        no_med,
-        no_bpom,
+        nomor_med,
+        nomor_bpom,
         selling_price,
         discount,
         indikasi,
         kandungan,
         kemasan,
-        category,
+        categoryId,
       });
 
       return this.handleSuccess({
@@ -325,7 +235,7 @@ class productService extends Service {
       });
 
       return this.handleSuccess({
-        message: "Get category",
+        message: "Get categoryId",
         statusCode: 200,
         data: findCategory,
       });

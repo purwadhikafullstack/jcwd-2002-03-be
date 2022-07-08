@@ -15,12 +15,10 @@ const Product = (sequelize) => {
     nomer_med: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     nomer_bpom: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     selling_price: {
       type: DataTypes.INTEGER,
