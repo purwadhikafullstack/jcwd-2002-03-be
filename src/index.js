@@ -19,7 +19,8 @@ const {
   profileRoutes,
   productRoutes,
   categoryRoutes,
-  paymentRoutes
+  paymentRoutes,
+  cartRoutes,
 } = require("./routes");
 
 app.use("/auth", authRoutes);
@@ -29,6 +30,7 @@ app.use("/profile", profileRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes)
 app.use("/payment", paymentRoutes)
+app.use("/cart", cartRoutes);
 app.use(
   "/profile-pictures",
   express.static(`${__dirname}/public/profile_pictures`)

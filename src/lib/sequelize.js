@@ -80,19 +80,19 @@ Inventory.belongsTo(Admin)
 Admin.hasMany(Inventory)
 
 module.exports = {
-    Address,
-    Admin,
-    Buy_stock,
-    Cart,
-    Category,
-    Inventory,
-    Product,
-    Product_image,
-    User,
-    sequelize,
-    Stock_order,
-    Stock_opname,
-    Stock_sold,
-    VerificationToken,
-    ForgotPasswordToken
-}
+  Address,
+  Admin,
+  Buy_stock,
+  Cart,
+  Category,
+  Inventory,
+  Product,
+  Product_image,
+  User,
+  sequelize,
+  Stock_order,
+  Stock_opname,
+  Stock_sold,
+  VerificationToken,
+  ForgotPasswordToken,
+};
