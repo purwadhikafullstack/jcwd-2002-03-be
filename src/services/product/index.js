@@ -1,5 +1,12 @@
 const Service = require("../service");
-const { Product, Product_image, Category, Stock_opname, Inventory } = require("../../lib/sequelize");
+const {
+  Product,
+  Product_image,
+  Category,
+  Stock_opname,
+  Inventory,
+  Admin,
+} = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 class productService extends Service {
   // npx nodemon . --inspect
@@ -67,8 +74,8 @@ class productService extends Service {
             attributes: ["amount"],
           },
           {
-            model: Inventory
-          }
+            model: Inventory,
+          },
         ],
       });
       return this.handleSuccess({
@@ -96,10 +103,28 @@ class productService extends Service {
     try {
       const { id } = req.params;
       const findProduct = await Product.findByPk(id, {
-        include: {
-          model: Product_image,
-          attributes: ["image_url"],
-        },
+        include: [
+          {
+            model: Product_image,
+            attributes: ["image_url"],
+          },
+          {
+            model: Inventory,
+            include: [
+              {
+                model: Admin,
+              },
+              {
+                model: Product,
+                include: Stock_opname,
+              },
+            ],
+          },
+          {
+            model: Stock_opname,
+            attributes: ["amount"],
+          },
+        ],
       });
       return this.handleSuccess({
         message: "Product found successfully",
@@ -126,8 +151,7 @@ class productService extends Service {
         kandungan,
         kemasan,
         categoryId,
-
-      } = req.body
+      } = req.body;
 
       const checkNameRegister = await Product.findOne({
         where: {
@@ -144,9 +168,9 @@ class productService extends Service {
 
       const checkNoMedRegister = await Product.findOne({
         where: {
-          nomer_med
-        }
-      })
+          nomer_med,
+        },
+      });
 
       if (checkNoMedRegister) {
         return this.handleError({
@@ -156,9 +180,9 @@ class productService extends Service {
       }
       const checkBpomRegister = await Product.findOne({
         where: {
-          nomer_bpom
-        }
-      })
+          nomer_bpom,
+        },
+      });
 
       if (checkBpomRegister) {
         return this.handleError({
@@ -177,23 +201,23 @@ class productService extends Service {
         kandungan,
         kemasan,
         categoryId,
-      })
+      });
 
       const result = await Product.findOne({
         where: {
-          id: inputProduct.dataValues.id
-        }, include: {
+          id: inputProduct.dataValues.id,
+        },
+        include: {
           model: Category,
-          attributes: ["id", "category_name"]
-        }
-      })
+          attributes: ["id", "category_name"],
+        },
+      });
 
       return this.handleSuccess({
         message: "new product Sucesss",
         statusCode: 201,
-        data: result
-      })
-
+        data: result,
+      });
     } catch (err) {
       console.log(err);
       return this.handleError({});
@@ -204,7 +228,7 @@ class productService extends Service {
       const { id } = req.params;
       const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
       const filePath = `products`;
-      const selectedFile = req.files
+      const selectedFile = req.files;
 
       if (!selectedFile) {
         return this.handleError({
@@ -220,7 +244,6 @@ class productService extends Service {
         };
       });
 
-
       const uploadPicture = await Product_image.bulkCreate(data);
 
       if (!uploadPicture) {
@@ -233,13 +256,14 @@ class productService extends Service {
       const updateData = await Product_image.findAll({
         where: {
           ProductId: id,
-        }, attributes: ["id", "image_url"]
-      })
+        },
+        attributes: ["id", "image_url"],
+      });
       return this.handleSuccess({
         message: "upload success",
         statusCode: 201,
-        data: updateData
-      })
+        data: updateData,
+      });
     } catch (err) {
       console.log(err);
       return this.handleError({});
@@ -259,7 +283,6 @@ class productService extends Service {
         message: "delete product success",
         statusCode: 200,
       });
-
     } catch (err) {
       console.log(err);
       this.handleError({
@@ -270,27 +293,26 @@ class productService extends Service {
   };
   static deleteProductImage = async (req) => {
     try {
-      const { ProductId, id } = req.params
+      const { ProductId, id } = req.params;
 
       const erase = await Product_image.destroy({
         where: {
           ProductId,
-          id
-        }
-      })
+          id,
+        },
+      });
 
       return this.handleSuccess({
         message: "succes delete image",
-        statusCode: 200
-      })
+        statusCode: 200,
+      });
     } catch (err) {
-      return this.handleError({})
+      return this.handleError({});
     }
-  }
+  };
   static updateProduct = async (req) => {
-
     try {
-      const { id } = req.params
+      const { id } = req.params;
       const {
         med_name,
         nomer_med,
@@ -300,56 +322,58 @@ class productService extends Service {
         indikasi,
         kandungan,
         kemasan,
-        categoryId } = req.body
+        categoryId,
+      } = req.body;
 
       const checkDuplicate = await Product.findOne({
         where: {
           [Op.or]: [{ med_name }, { nomer_bpom }, { nomer_med }],
           id: {
-            [Op.ne]: id
-          }
-        }
-      })
+            [Op.ne]: id,
+          },
+        },
+      });
 
       if (checkDuplicate?.dataValues.med_name === med_name) {
         return this.handleError({
           message: "data duplicate please try another med_name",
-          statusCode: 400
-        })
+          statusCode: 400,
+        });
       } else if (checkDuplicate?.dataValues.nomer_bpom === nomer_bpom) {
         return this.handleError({
           message: "data duplicate please try another nomer_bpom",
-          statusCode: 400
-        })
+          statusCode: 400,
+        });
       } else if (checkDuplicate?.dataValues.nomer_med === nomer_med) {
         return this.handleError({
           message: "data duplicate please try another nomer_med",
-          statusCode: 400
-        })
+          statusCode: 400,
+        });
       }
-      const updateData = await Product.update({
-        med_name,
-        nomer_med,
-        nomer_bpom,
-        selling_price,
-        discount,
-        indikasi,
-        kandungan,
-        kemasan,
-        categoryId
-      }, { where: { id } })
+      const updateData = await Product.update(
+        {
+          med_name,
+          nomer_med,
+          nomer_bpom,
+          selling_price,
+          discount,
+          indikasi,
+          kandungan,
+          kemasan,
+          categoryId,
+        },
+        { where: { id } }
+      );
 
       return this.handleSuccess({
         message: "edit data success",
         statusCode: 200,
-        data: updateData
-      })
-
+        data: updateData,
+      });
     } catch (err) {
-      console.log(err)
-      return this.handleError({})
-
+      console.log(err);
+      return this.handleError({});
     }
-  }
+  };
 }
 module.exports = productService;
