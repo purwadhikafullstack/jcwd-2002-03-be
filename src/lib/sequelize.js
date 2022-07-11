@@ -2,12 +2,12 @@ const { Sequelize } = require("sequelize");
 const mysqlConfig = require("../config/database");
 
 const sequelize = new Sequelize({
-    username: mysqlConfig.MYSQL_USERNAME,
-    password: mysqlConfig.MYSQL_PASSWORD,
-    database: mysqlConfig.MYSQL_DB_NAME,
-    port: 3306,
-    dialect: "mysql",
-    logging: false,
+  username: mysqlConfig.MYSQL_USERNAME,
+  password: mysqlConfig.MYSQL_PASSWORD,
+  database: mysqlConfig.MYSQL_DB_NAME,
+  port: 3306,
+  dialect: "mysql",
+  logging: false,
 });
 
 // models
@@ -28,6 +28,7 @@ const Product_image = require("../models/product_image")(sequelize);
 const Transaction = require("../models/transaction")(sequelize);
 const Transaction_items = require("../models/transaction_items")(sequelize);
 const Payment = require("../models/payment")(sequelize);
+const Prescription_image = require("../models/prescription_image")(sequelize)
 
 // Associations
 
@@ -62,10 +63,19 @@ Product.hasMany(Stock_order);
 Stock_order.belongsTo(Admin);
 Admin.hasMany(Stock_order);
 
+
 Payment.belongsTo(Admin);
 Admin.hasMany(Payment);
 Payment.belongsTo(Transaction);
 Transaction.hasMany(Payment);
+Transaction.belongsTo(Admin)
+Admin.hasMany(Transaction)
+Transaction.belongsTo(Address)
+Address.hasMany(Transaction)
+Transaction.belongsTo(User)
+User.hasMany(Transaction)
+Prescription_image.belongsTo(Transaction)
+Transaction.hasMany(Prescription_image)
 
 Stock_opname.belongsTo(Product);
 Product.hasMany(Stock_opname);
@@ -86,6 +96,8 @@ module.exports = {
   Cart,
   Category,
   Inventory,
+  Payment,
+  Prescription_image,
   Product,
   Product_image,
   User,
@@ -93,6 +105,8 @@ module.exports = {
   Stock_order,
   Stock_opname,
   Stock_sold,
+  Transaction,
+  Transaction_items,
   VerificationToken,
-  ForgotPasswordToken,
-};
+  ForgotPasswordToken
+}

@@ -6,29 +6,17 @@ const Transaction = (sequelize) => {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
-            // product_id
+            allowNull: true,
             // user_id
             // admin_id
+            // address_id
         },
         total_price: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         isPaid: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
-        },
-        recipient_address: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        recipient_name: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        recipient_phone: {
-            type: DataTypes.INTEGER,
             allowNull: false
         },
         isPacking: {

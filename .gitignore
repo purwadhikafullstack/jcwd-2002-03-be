@@ -3,4 +3,6 @@ node_modules
 src/public/profile_pictures/**
 src/public/products/**
 src/public/payment_receipts/**
+src/public/prescriptions/**
+src/public/transactions/**
 
