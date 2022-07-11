@@ -214,10 +214,10 @@ class authService extends Service {
       delete findAdmin.dataValues.password
 
       const token = generateToken({
-        id: findAdmin.id
+        id: findAdmin.id,
+        role: findAdmin.role
       });
 
-      console.log(findAdmin.dataValues)
       return this.handleSuccess({
         message: "login admin success",
         statusCode: 200,

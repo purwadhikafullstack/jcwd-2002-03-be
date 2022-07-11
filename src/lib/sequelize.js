@@ -96,6 +96,7 @@ module.exports = {
   Cart,
   Category,
   Inventory,
+  Payment,
   Prescription_image,
   Product,
   Product_image,

@@ -173,11 +173,9 @@ class profileService extends Service {
         main_address
       } = req.body;
       const UserId = req.token.id
-      console.log(UserId)
 
-
+      // function to check if user already set main_address , in other addres id
       if (main_address === true) {
-        // function to check if user already set main_address , in other addres id
         const checkMainAddress = await Address.findAll({
           where: {
             UserId,

@@ -1,5 +1,6 @@
 const Service = require("../service")
-const { Transaction, Transaction_items, Prescription_image } = require("../../lib/sequelize")
+const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address } = require("../../lib/sequelize");
+const { Op } = require("sequelize");
 
 class TrasactionService extends Service {
     static newTransactionByPrescription = async (req) => {
@@ -16,6 +17,16 @@ class TrasactionService extends Service {
                 });
             }
 
+            const checkAddress = await Address.findOne({
+                where: {
+                    UserId,
+                    main_address: true
+
+                }
+            })
+
+            const AddressId = checkAddress.dataValues.id
+
             const buy = await Transaction.create({
                 total_price: 0,
                 isPaid: false,
@@ -23,6 +34,7 @@ class TrasactionService extends Service {
                 isSend: false,
                 isDone: false,
                 UserId,
+                AddressId
             })
 
             const data = selectedFile.map((val) => {
@@ -38,6 +50,63 @@ class TrasactionService extends Service {
                 message: "transaction sumbit success",
                 statusCode: 201,
             })
+        } catch (err) {
+            console.log(err)
+            return this.handleError({})
+        }
+    }
+    static getAllTransaction = async (req) => {
+        try {
+            const {
+                _sortBy = "",
+                _sortDir = "",
+                _limit = 10,
+                _page = 1,
+            } = req.query
+
+            delete req.query._limit;
+            delete req.query._page;
+            delete req.query._sortBy;
+            delete req.query._sortDir;
+
+            const findTransactions = await Transaction.findAndCountAll({
+                where: {
+                    ...req.query
+                },
+                limit: _limit ? parseInt(_limit) : undefined,
+                offset: (_page - 1) * _limit,
+                order: _sortBy ? [[_sortBy, _sortDir]] : undefined,
+                distinct: true,
+                include: [
+                    {
+                        model: Address,
+                    },
+                    {
+                        model: Prescription_image
+                    },
+                    {
+                        model: Transaction_items,
+                        includes: [
+                            {
+                                model: Product
+                            }
+                        ]
+                    },
+                    {
+                        model: Payment
+                    },
+
+                ]
+            })
+
+            console.log(findTransactions)
+
+            return this.handleSuccess({
+                message: "get all product success",
+                statusCode: 200,
+                data: findTransactions
+            })
+
         } catch (err) {
             console.log(err)
             return this.handleError({})
