@@ -5,7 +5,8 @@ const { Op } = require("sequelize");
 class inventoryService extends Service {
   static addStockProduct = async (req) => {
     try {
-      const { quantity, expired_date, ProductId, buying_price } = req.body;
+      const { quantity, expired_date, ProductId, buying_price, type } =
+        req.body;
       console.log(req.body);
 
       const addStock = await Inventory.create({
@@ -13,6 +14,7 @@ class inventoryService extends Service {
         expired_date,
         ProductId,
         buying_price,
+        type,
         AdminId: req.token.id,
       });
 
