@@ -1,7 +1,7 @@
 const Service = require("../service")
-const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address } = require("../../lib/sequelize");
+const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address, Category } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
-const nanoid = require("nanoid")
+const { nanoid } = require("nanoid")
 
 class TrasactionService extends Service {
     static newTransactionByPrescription = async (req) => {
@@ -63,10 +63,10 @@ class TrasactionService extends Service {
     static getAllTransaction = async (req) => {
         try {
             const {
-                _sortBy = "",
-                _sortDir = "",
-                _limit = 10,
-                _page = 1,
+                _sortBy,
+                _sortDir,
+                _limit,
+                _page,
             } = req.query
 
             delete req.query._limit;
@@ -98,7 +98,13 @@ class TrasactionService extends Service {
                         include: [
                             {
                                 model: Product,
-                                include: [Product_image]
+                                include: [{
+                                    model: Product_image
+                                },
+                                {
+                                    model: Category
+                                }
+                                ]
 
                             }
                         ]
@@ -110,10 +116,12 @@ class TrasactionService extends Service {
                 ]
             })
 
+            const result = { ...findTransactions, totalPages: Math.ceil(findTransactions.count / _limit) }
+
             return this.handleSuccess({
                 message: "get all product success",
                 statusCode: 200,
-                data: findTransactions
+                data: result,
             })
 
         } catch (err) {
