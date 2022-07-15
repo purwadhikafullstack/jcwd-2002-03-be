@@ -11,6 +11,14 @@ const Transaction = (sequelize) => {
             // admin_id
             // address_id
         },
+        nomer_pesanan: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        delivery_cost: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
         total_price: {
             type: DataTypes.INTEGER,
             allowNull: true
@@ -31,6 +39,10 @@ const Transaction = (sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: false
         },
+        isValid: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        }
     });
 };
 

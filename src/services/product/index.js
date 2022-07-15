@@ -1,3 +1,4 @@
+
 const Service = require("../service");
 const {
   Product,
@@ -15,7 +16,7 @@ class productService extends Service {
       const {
         _sortBy = "",
         _sortDir = "",
-        _limit = 30,
+        _limit = undefined,
         _page = 1,
         priceMin,
         priceMax,
@@ -377,3 +378,4 @@ class productService extends Service {
   };
 }
 module.exports = productService;
+

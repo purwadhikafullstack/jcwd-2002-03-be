@@ -18,11 +18,10 @@ const Transaction_items = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        delivery_cost: {
+        sub_total: {
             type: DataTypes.INTEGER,
-            allowNull: true
+            allowNull: false
         }
-
     })
 }
 

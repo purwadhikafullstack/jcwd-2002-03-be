@@ -1,6 +1,7 @@
 const Service = require("../service")
-const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address } = require("../../lib/sequelize");
+const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address, Category } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
+const { nanoid } = require("nanoid")
 
 class TrasactionService extends Service {
     static newTransactionByPrescription = async (req) => {
@@ -9,6 +10,8 @@ class TrasactionService extends Service {
             const filePath = "prescriptions";
             const UserId = req.token.id
             const selectedFile = req.files
+
+            const nomer_pesanan = nanoid(8)
 
             if (!selectedFile) {
                 return this.handleError({
@@ -28,6 +31,8 @@ class TrasactionService extends Service {
             const AddressId = checkAddress.dataValues.id
 
             const buy = await Transaction.create({
+                isValid: true,
+                nomer_pesanan,
                 total_price: 0,
                 isPaid: false,
                 isPacking: false,
@@ -58,10 +63,10 @@ class TrasactionService extends Service {
     static getAllTransaction = async (req) => {
         try {
             const {
-                _sortBy = "",
-                _sortDir = "",
-                _limit = 10,
-                _page = 1,
+                _sortBy,
+                _sortDir,
+                _limit,
+                _page,
             } = req.query
 
             delete req.query._limit;
@@ -82,13 +87,25 @@ class TrasactionService extends Service {
                         model: Address,
                     },
                     {
+                        model: User,
+                        attributes: ["name"]
+                    },
+                    {
                         model: Prescription_image
                     },
                     {
                         model: Transaction_items,
-                        includes: [
+                        include: [
                             {
-                                model: Product
+                                model: Product,
+                                include: [{
+                                    model: Product_image
+                                },
+                                {
+                                    model: Category
+                                }
+                                ]
+
                             }
                         ]
                     },
@@ -99,14 +116,56 @@ class TrasactionService extends Service {
                 ]
             })
 
-            console.log(findTransactions)
+            const result = { ...findTransactions, totalPages: Math.ceil(findTransactions.count / _limit) }
 
             return this.handleSuccess({
                 message: "get all product success",
                 statusCode: 200,
-                data: findTransactions
+                data: result,
             })
 
+        } catch (err) {
+            console.log(err)
+            return this.handleError({})
+        }
+    }
+    static addTransactionItemsByAdmin = async (req) => {
+        try {
+            const data = req.body
+            console.log(data)
+            const addTransactionItems = await Transaction_items.bulkCreate(data)
+            console.log("items", addTransactionItems)
+
+            const totalPriceAllItems = data.reduce((sum, object) => {
+                return sum + object.sub_total
+            }, 0)
+
+            console.log({ subtotal: totalPriceAllItems })
+
+            const updateTrasactions = await Transaction.update({
+                total_price: totalPriceAllItems,
+                AdminId: req.token.id,
+                isValid: true
+            }, {
+                where: {
+                    id: data[0].TransactionId
+                }
+            })
+
+            console.log("update", updateTrasactions)
+
+            const createPayment = await Payment.create({
+                TransactionId: data[0].TransactionId,
+                AdminId: req.token.id,
+                method: "BCA VA"
+            })
+            console.log("payment", createPayment)
+
+            return this.handleSuccess({
+                message: "Order with a doctor's prescription successfully handled",
+                statusCode: 201,
+                data: addTransactionItems
+            })
         } catch (err) {
             console.log(err)
             return this.handleError({})
