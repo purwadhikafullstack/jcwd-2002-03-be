@@ -1,6 +1,7 @@
 const Service = require("../service")
 const { Transaction, Transaction_items, Prescription_image, Product_image, Payment, Product, User, Address } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
+const { nanoid } = require("nanoid")
 
 class TrasactionService extends Service {
     static newTransactionByPrescription = async (req) => {
@@ -26,6 +27,7 @@ class TrasactionService extends Service {
             })
 
             const AddressId = checkAddress.dataValues.id
+            const nomer_pesanan = nanoid(8)
 
             const buy = await Transaction.create({
                 total_price: 0,
@@ -34,7 +36,8 @@ class TrasactionService extends Service {
                 isSend: false,
                 isDone: false,
                 UserId,
-                AddressId
+                AddressId,
+                nomer_pesanan
             })
 
             const data = selectedFile.map((val) => {
@@ -82,11 +85,15 @@ class TrasactionService extends Service {
                         model: Address,
                     },
                     {
+                        model: User,
+                        attributes: ["name"]
+                    },
+                    {
                         model: Prescription_image
                     },
                     {
                         model: Transaction_items,
-                        includes: [
+                        include: [
                             {
                                 model: Product
                             }

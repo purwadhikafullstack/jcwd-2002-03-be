@@ -15,7 +15,7 @@ class productService extends Service {
       const {
         _sortBy = "",
         _sortDir = "",
-        _limit = 30,
+        _limit = undefined,
         _page = 1,
         priceMin,
         priceMax,
@@ -202,6 +202,10 @@ class productService extends Service {
         kemasan,
         categoryId,
       });
+
+      const addStockOpname = await Stock_opname.create({
+        ProductId: inputProduct.dataValues.id
+      })
 
       const result = await Product.findOne({
         where: {

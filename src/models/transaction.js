@@ -31,6 +31,10 @@ const Transaction = (sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: false
         },
+        nomer_pesanan: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
     });
 };
 
