@@ -158,7 +158,7 @@ class authService extends Service {
 
       if (checkEmailAdmin) {
         return this.handleError({
-          message: "This email has been registered, if you forget your password, you can reset your password",
+          message: "This email has been registered, please use another email Address",
           statusCode: 400,
         });
       }
@@ -172,7 +172,7 @@ class authService extends Service {
       });
 
       return this.handleSuccess({
-        message: "your account was created successfully",
+        message: "New Admin account was created successfully",
         statusCode: 201,
         data: newAdmin,
       });
