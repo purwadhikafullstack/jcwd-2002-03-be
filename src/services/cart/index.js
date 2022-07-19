@@ -11,14 +11,10 @@ class cartService extends Service {
         include: [
           {
             model: Product,
-            attributes: ["med_name", "discount"],
             include: [
               {
                 model: Product_image,
                 attributes: ["image_url"],
-                where: {
-                  id: 1,
-                },
               },
             ],
           },
@@ -37,61 +33,63 @@ class cartService extends Service {
       });
     }
   };
-  static getCartByUserId = async (req) => {
-    try {
-      const { ProductId, UserId } = req.query;
-      const findCart = await Cart.findOne({
-        where: {
-          UserId,
-          ProductId,
-        },
-        include: [
-          {
-            model: Product,
-            attributes: ["med_name", "discount"],
-            include: [
-              {
-                model: Product_image,
-                attributes: ["image_url"],
-                where: {
-                  id: 1,
-                },
-              },
-            ],
-          },
-        ],
-      });
-      return this.handleSuccess({
-        message: "get cart was successfull",
-        statusCode: 200,
-        data: findCart,
-      });
-    } catch (err) {
-      console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
-    }
-  };
+  // static getCartByUserId = async (req) => {
+  //   try {
+  //     const { ProductId, UserId } = req.query;
+  //     const findCart = await Cart.findOne({
+  //       where: {
+  //         UserId,
+  //         ProductId,
+  //       },
+  //       include: [
+  //         {
+  //           model: Product,
+  //           attributes: ["med_name", "discount"],
+  //           include: [
+  //             {
+  //               model: Product_image,
+  //               attributes: ["image_url"],
+  //               where: {
+  //                 id: 1,
+  //               },
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
+  //     return this.handleSuccess({
+  //       message: "get cart was successfull",
+  //       statusCode: 200,
+  //       data: findCart,
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //     this.handleError({
+  //       message: "Server Error",
+  //       statusCode: 500,
+  //     });
+  //   }
+  // };
   static addToCart = async (req) => {
     try {
       const { ProductId, UserId, quantity, price } = req.body;
-      console.log("product", ProductId);
-      console.log("userId", UserId);
-      console.log("quan", quantity);
-      console.log("harga", price);
+      const sub_total = quantity * price;
+      // console.log(sub_total);
+      // console.log("product", ProductId);
+      // console.log("userId", UserId);
+      // console.log("quan", quantity);
+      // console.log("harga", price);
       const findCart1 = await Cart.findOne({
         where: {
           UserId,
           ProductId,
         },
       });
-      console.log(findCart1.id);
       if (findCart1) {
         await Cart.update(
           {
             quantity,
+            sub_total,
           },
           {
             where: {
@@ -106,6 +104,7 @@ class cartService extends Service {
           quantity,
           UserId,
           price,
+          sub_total,
         });
       }
       const findCart2 = await Cart.findOne({
@@ -130,7 +129,7 @@ class cartService extends Service {
   static deleteCart = async (req) => {
     try {
       const { id } = req.params;
-      console.log(id);
+      // console.log(id);
 
       await Cart.destroy({
         where: {

@@ -25,5 +25,14 @@ router.post(
   authorizedTokenAdmin,
   controllers(TransactionService.addTransactionItemsByAdmin)
 );
+router.get(
+  "/user-transaction",
+  // authorizedTokenAdmin,
+  controllers(TransactionService.getAllUserTransaction)
+);
+router.post(
+  "/create-transaction",
+  controllers(TransactionService.createTransaction)
+);
 
 module.exports = router;
