@@ -9,6 +9,7 @@ const {
   User,
   Address,
   Category,
+  Cart,
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");
@@ -196,6 +197,143 @@ class TrasactionService extends Service {
     } catch (err) {
       console.log(err);
       return this.handleError({});
+    }
+  };
+  static getAllUserTransaction = async (req) => {
+    // setiap query ato params datanya pasti string
+    // console.timeEnd()
+    // console.time()
+
+    try {
+      const { isPacking, isSend, isValid, isDone, isPaid } = req.query;
+      console.log(req.query);
+      delete req.query._isDone;
+      delete req.query._isPacking;
+      delete req.query._isSend;
+      delete req.query._isValid;
+      delete req.query._isPaid;
+      delete req.query.isAll;
+      let whereCondition = { ...req.query, UserId: 2 };
+      if (isPaid) whereCondition.isPaid = true;
+
+      if (isPacking) whereCondition.isPacking = true;
+
+      if (isDone) whereCondition.isPacking = true;
+
+      if (isSend) whereCondition.isSend = true;
+
+      if (isValid) whereCondition.isValid = true;
+
+      const findTransactions = await Transaction.findAndCountAll({
+        where: whereCondition,
+        distinct: true,
+        include: [
+          {
+            model: Address,
+          },
+          {
+            model: Prescription_image,
+          },
+          {
+            model: Transaction_items,
+            include: {
+              model: Product,
+              include: {
+                model: Product_image,
+              },
+            },
+          },
+          {
+            model: Payment,
+          },
+        ],
+      });
+      return this.handleSuccess({
+        message: "get all transaction success",
+        statusCode: 200,
+        data: findTransactions,
+      });
+    } catch (err) {
+      console.log(err);
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static createTransaction = async (req) => {
+    try {
+      // const UserId = req.token.id;
+      const UserId = 2;
+      // const { method } = req.body;
+      const data = req.body;
+      const selectedData = data.map((val) => {
+        return {
+          sub_total: val.sub_total,
+          ProductId: val.ProductId,
+          price: val.price,
+          quantity: val.quantity,
+        };
+      });
+      const grandTotal = selectedData.reduce((sum, object) => {
+        return sum + object.sub_total;
+      }, 0);
+
+      const checkAddress = await Address.findOne({
+        where: {
+          UserId,
+          main_address: true,
+        },
+      });
+      const AddressId = checkAddress.dataValues.id;
+
+      const createTransaction = await Transaction.create({
+        total_price: grandTotal,
+        isPaid: false,
+        isPacking: false,
+        isSend: false,
+        isDone: false,
+        isConfirm: false,
+        isValid: false,
+        UserId,
+        AddressId,
+      });
+      const inputTransaction = selectedData.map((val) => {
+        return { ...val, TransactionId: createTransaction.dataValues.id };
+      });
+      const createTransaction_items = await Transaction_items.bulkCreate(
+        inputTransaction
+      );
+      const findTransaction = await Transaction.findOne({
+        where: {
+          UserId,
+        },
+      });
+
+      const TransactionId = findTransaction.dataValues.id;
+      // await Payment.create({
+      //   TransactionId,
+      //   method,
+      // });
+      const deletedCart = data.map((val) => {
+        return val.id;
+      });
+      await Cart.destroy({
+        where: {
+          id: deletedCart,
+        },
+      });
+
+      return this.handleSuccess({
+        message: "transaction sumbit success",
+        statusCode: 201,
+      });
+    } catch (err) {
+      console.log(err);
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
     }
   };
 }

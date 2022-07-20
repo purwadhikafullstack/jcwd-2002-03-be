@@ -11,19 +11,20 @@ class cartService extends Service {
         include: [
           {
             model: Product,
-            attributes: ["med_name", "discount"],
+            // attributes: ["med_name", "discount"],
             include: [
               {
                 model: Product_image,
                 attributes: ["image_url"],
-                where: {
-                  id: 1,
-                },
+                // where: {
+                //   id: 1,
+                // },
               },
             ],
           },
         ],
       });
+      console.log(findCart);
       return this.handleSuccess({
         message: "get cart was successfull",
         statusCode: 200,
