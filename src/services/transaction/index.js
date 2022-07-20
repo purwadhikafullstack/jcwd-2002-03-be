@@ -44,10 +44,7 @@ class TrasactionService extends Service {
         isValid: true,
         nomer_pesanan,
         total_price: 0,
-        isPaid: false,
-        isPacking: false,
-        isSend: false,
-        isDone: false,
+        status: "pesanan baru",
         UserId,
         AddressId,
       });
@@ -77,8 +74,11 @@ class TrasactionService extends Service {
         _sortDir = "",
         _limit = "",
         _page = "",
+        status = "",
         searchName,
       } = req.query;
+
+      console.log("query", req.query)
 
       delete req.query._limit;
       delete req.query._page;
@@ -138,11 +138,13 @@ class TrasactionService extends Service {
           },
         ],
       });
+      console.log(findTransactions)
 
       const result = {
         ...findTransactions,
         totalPages: Math.ceil(findTransactions.count / _limit),
       };
+
 
       return this.handleSuccess({
         message: "get all product success",
