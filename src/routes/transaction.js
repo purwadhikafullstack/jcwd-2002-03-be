@@ -34,5 +34,10 @@ router.post(
   "/create-transaction",
   controllers(TransactionService.createTransaction)
 );
+router.patch(
+  "/:TransactionId/transaction-status",
+  authorizedTokenAdmin,
+  controllers(TransactionService.approveTransaction)
+);
 
 module.exports = router;

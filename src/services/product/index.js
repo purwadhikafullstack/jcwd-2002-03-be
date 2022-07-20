@@ -1,3 +1,4 @@
+
 const Service = require("../service");
 const {
   Product,
@@ -203,6 +204,10 @@ class productService extends Service {
         categoryId,
       });
 
+      const addStockOpname = await Stock_opname.create({
+        ProductId: inputProduct.dataValues.id
+      })
+
       const result = await Product.findOne({
         where: {
           id: inputProduct.dataValues.id,
@@ -377,3 +382,4 @@ class productService extends Service {
   };
 }
 module.exports = productService;
+
