@@ -27,11 +27,12 @@ router.post(
 );
 router.get(
   "/user-transaction",
-  // authorizedTokenAdmin,
+  authorizedToken,
   controllers(TransactionService.getAllUserTransaction)
 );
 router.post(
   "/create-transaction",
+  authorizedToken,
   controllers(TransactionService.createTransaction)
 );
 router.patch(

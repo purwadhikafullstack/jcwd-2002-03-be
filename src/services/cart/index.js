@@ -3,10 +3,10 @@ const { User, Cart, Product, Product_image } = require("../../lib/sequelize");
 class cartService extends Service {
   static getCart = async (req) => {
     try {
-      const { UserId } = req.params;
+
       const findCart = await Cart.findAndCountAll({
         where: {
-          UserId,
+          UserId: req.token.id,
         },
         include: [
           {
@@ -72,13 +72,11 @@ class cartService extends Service {
   // };
   static addToCart = async (req) => {
     try {
-      const { ProductId, UserId, quantity, price } = req.body;
+      const { ProductId, quantity, price } = req.body;
       const sub_total = quantity * price;
-      // console.log(sub_total);
-      // console.log("product", ProductId);
-      // console.log("userId", UserId);
-      // console.log("quan", quantity);
-      // console.log("harga", price);
+      console.log("tokenid", req.token.id)
+      const UserId = req.token.id
+
       const findCart1 = await Cart.findOne({
         where: {
           UserId,

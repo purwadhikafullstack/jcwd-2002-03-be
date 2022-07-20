@@ -37,12 +37,12 @@ class TrasactionService extends Service {
         },
       });
 
-      if (!checkAddress) {
-        return this.handleError({
-          message: "verify success",
-          redirect: `http://localhost:3000/address-form`
-        })
-      }
+      // if (!checkAddress) {
+      //   return this.handleError({
+      //     message: "verify success",
+      //     redirect: `http://localhost:3000/address-form`
+      //   })
+      // }
 
       const AddressId = checkAddress.dataValues.id;
 
@@ -110,8 +110,8 @@ class TrasactionService extends Service {
       if (isPaid === "true") { whereCondition.isPaid = true }
       if (isPacking === "false") { whereCondition.isPacking = false; }
       if (isPacking === "true") { whereCondition.isPacking = true; }
-      if (isDone === "true") { whereCondition.isPacking = true; }
-      if (isDone === "false") { whereCondition.isPacking = false; }
+      if (isDone === "true") { whereCondition.isDone = true; }
+      if (isDone === "false") { whereCondition.isDone = false; }
       if (isSend === "true") whereCondition.isSend = true;
       if (isSend === "false") whereCondition.isSend = false;
       if (isValid === "true") whereCondition.isValid = true;
@@ -165,7 +165,6 @@ class TrasactionService extends Service {
           },
         ],
       });
-      console.log(findTransactions)
 
       const result = {
         ...findTransactions,
@@ -186,15 +185,12 @@ class TrasactionService extends Service {
   static addTransactionItemsByAdmin = async (req) => {
     try {
       const data = req.body;
-      console.log(data);
       const addTransactionItems = await Transaction_items.bulkCreate(data);
-      console.log("items", addTransactionItems);
 
       const totalPriceAllItems = data.reduce((sum, object) => {
         return sum + object.sub_total;
       }, 0);
 
-      console.log({ subtotal: totalPriceAllItems });
 
       const updateTrasactions = await Transaction.update(
         {
@@ -209,14 +205,12 @@ class TrasactionService extends Service {
         }
       );
 
-      console.log("update", updateTrasactions);
 
       const createPayment = await Payment.create({
         TransactionId: data[0].TransactionId,
         AdminId: req.token.id,
         method: "BCA VA",
       });
-      console.log("payment", createPayment);
 
       return this.handleSuccess({
         message: "Order with a doctor's prescription successfully handled",
@@ -230,28 +224,27 @@ class TrasactionService extends Service {
   }
   static getAllUserTransaction = async (req) => {
     // setiap query ato params datanya pasti string
-    // console.timeEnd()
-    // console.time()
 
     try {
       const { isPacking, isSend, isValid, isDone, isPaid } = req.query;
-      console.log(req.query);
-      delete req.query._isDone;
-      delete req.query._isPacking;
-      delete req.query._isSend;
-      delete req.query._isValid;
-      delete req.query._isPaid;
+      delete req.query.isDone;
+      delete req.query.isPacking;
+      delete req.query.isSend;
+      delete req.query.isValid;
+      delete req.query.isPaid;
       delete req.query.isAll;
-      let whereCondition = { ...req.query, UserId: 2 };
-      if (isPaid) whereCondition.isPaid = true;
 
-      if (isPacking) whereCondition.isPacking = true;
-
-      if (isDone) whereCondition.isPacking = true;
-
-      if (isSend) whereCondition.isSend = true;
-
-      if (isValid) whereCondition.isValid = true;
+      let whereCondition = { ...req.query, UserId: req.token.id };
+      if (isPaid === "false") { whereCondition.isPaid = false }
+      if (isPaid === "true") { whereCondition.isPaid = true }
+      if (isPacking === "false") { whereCondition.isPacking = false; }
+      if (isPacking === "true") { whereCondition.isPacking = true; }
+      if (isDone === "true") { whereCondition.isPacking = true; }
+      if (isDone === "false") { whereCondition.isPacking = false; }
+      if (isSend === "true") whereCondition.isSend = true;
+      if (isSend === "false") whereCondition.isSend = false;
+      if (isValid === "true") whereCondition.isValid = true;
+      if (isValid === "false") whereCondition.isValid = false;
 
       const findTransactions = await Transaction.findAndCountAll({
         where: whereCondition,
@@ -292,11 +285,9 @@ class TrasactionService extends Service {
   };
   static createTransaction = async (req) => {
     try {
-      // const UserId = req.token.id;
-      const UserId = 2;
-      // const { method } = req.body;
       const data = req.body;
-      console.log(req.body);
+
+      const UserId = req.token.id
       const checkAddress = await Address.findOne({
         where: {
           UserId,
@@ -311,6 +302,7 @@ class TrasactionService extends Service {
         isPacking: false,
         isSend: false,
         isDone: false,
+        isValid: true,
         UserId,
         AddressId,
       });
