@@ -10,7 +10,7 @@ const {
   Address,
   Category,
 } = require("../../lib/sequelize");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { nanoid } = require("nanoid");
 
 class TrasactionService extends Service {
@@ -344,6 +344,26 @@ class TrasactionService extends Service {
       });
     }
   };
+  static approveTransaction = async (req) => {
+    try {
+      const { TransactionId } = req.params
+      const data = req.body
+      const approve = await Transaction.update(
+        data
+        , {
+          where: {
+            id: TransactionId
+          }
+        })
+      return this.handleSuccess({
+        message: "transaction approve success",
+        data: approve,
+        statusCode: 201
+      })
+    } catch (err) {
+      return this.handleError({})
+    }
+  }
 }
 
 module.exports = TrasactionService;
