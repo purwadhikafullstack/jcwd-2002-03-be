@@ -10,9 +10,8 @@ const {
   Address,
   Category,
 } = require("../../lib/sequelize");
-const { Op } = require("sequelize");
-const { nanoid } = require("nanoid");
 const { Op, where } = require("sequelize");
+const { nanoid } = require("nanoid");
 
 class TrasactionService extends Service {
   static newTransactionByPrescription = async (req) => {
@@ -38,6 +37,13 @@ class TrasactionService extends Service {
         },
       });
 
+      if (!checkAddress) {
+        return this.handleError({
+          message: "verify success",
+          redirect: `http://localhost:3000/address-form`
+        })
+      }
+
       const AddressId = checkAddress.dataValues.id;
 
       const buy = await Transaction.create({
@@ -45,9 +51,9 @@ class TrasactionService extends Service {
         nomer_pesanan,
         total_price: 0,
         isPaid: false,
-        isPacking: false,
-        isSend: false,
         isDone: false,
+        isSend: false,
+        isPacking: false,
         UserId,
         AddressId,
       });
@@ -77,16 +83,39 @@ class TrasactionService extends Service {
         _sortDir = "",
         _limit = "",
         _page = "",
+        isPacking,
+        isSend,
+        isValid,
+        isDone,
+        isPaid,
         searchName,
       } = req.query;
+
+      console.log("query", req.query)
 
       delete req.query._limit;
       delete req.query._page;
       delete req.query._sortBy;
       delete req.query._sortDir;
+      delete req.query.isDone;
+      delete req.query.isPacking;
+      delete req.query.isSend;
+      delete req.query.isValid;
+      delete req.query.isPaid;
       delete req.query.searchName;
 
       let searchByNameClause = {};
+      let whereCondition = { ...req.query };
+      if (isPaid === "false") { whereCondition.isPaid = false }
+      if (isPaid === "true") { whereCondition.isPaid = true }
+      if (isPacking === "false") { whereCondition.isPacking = false; }
+      if (isPacking === "true") { whereCondition.isPacking = true; }
+      if (isDone === "true") { whereCondition.isPacking = true; }
+      if (isDone === "false") { whereCondition.isPacking = false; }
+      if (isSend === "true") whereCondition.isSend = true;
+      if (isSend === "false") whereCondition.isSend = false;
+      if (isValid === "true") whereCondition.isValid = true;
+      if (isValid === "false") whereCondition.isValid = false;
 
       if (searchName) {
         searchByNameClause = {
@@ -95,9 +124,7 @@ class TrasactionService extends Service {
       }
 
       const findTransactions = await Transaction.findAndCountAll({
-        where: {
-          ...req.query,
-        },
+        where: whereCondition,
         limit: _limit ? parseInt(_limit) : undefined,
         offset: (_page - 1) * _limit,
         order: _sortBy ? [[_sortBy, _sortDir]] : undefined,
@@ -138,11 +165,13 @@ class TrasactionService extends Service {
           },
         ],
       });
+      console.log(findTransactions)
 
       const result = {
         ...findTransactions,
         totalPages: Math.ceil(findTransactions.count / _limit),
       };
+
 
       return this.handleSuccess({
         message: "get all product success",
@@ -315,6 +344,26 @@ class TrasactionService extends Service {
       });
     }
   };
+  static approveTransaction = async (req) => {
+    try {
+      const { TransactionId } = req.params
+      const data = req.body
+      const approve = await Transaction.update(
+        data
+        , {
+          where: {
+            id: TransactionId
+          }
+        })
+      return this.handleSuccess({
+        message: "transaction approve success",
+        data: approve,
+        statusCode: 201
+      })
+    } catch (err) {
+      return this.handleError({})
+    }
+  }
 }
 
 module.exports = TrasactionService;
