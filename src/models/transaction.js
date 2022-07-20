@@ -11,6 +11,10 @@ const Transaction = (sequelize) => {
             // admin_id
             // address_id
         },
+        nomer_pesanan: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         total_price: {
             type: DataTypes.INTEGER,
             allowNull: true,
@@ -28,10 +32,6 @@ const Transaction = (sequelize) => {
             allowNull: false,
         },
         isDone: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-        },
-        isConfirm: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
         },

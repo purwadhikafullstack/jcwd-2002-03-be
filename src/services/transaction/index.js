@@ -12,7 +12,6 @@ const {
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");
-const { Op, where } = require("sequelize");
 
 class TrasactionService extends Service {
   static newTransactionByPrescription = async (req) => {
@@ -38,13 +37,23 @@ class TrasactionService extends Service {
         },
       });
 
+      if (!checkAddress) {
+        return this.handleError({
+          message: "verify success",
+          redirect: `http://localhost:3000/address-form`
+        })
+      }
+
       const AddressId = checkAddress.dataValues.id;
 
       const buy = await Transaction.create({
         isValid: true,
         nomer_pesanan,
         total_price: 0,
-        status: "pesanan baru",
+        isPaid: false,
+        isDone: false,
+        isSend: false,
+        isPacking: false,
         UserId,
         AddressId,
       });
@@ -74,7 +83,11 @@ class TrasactionService extends Service {
         _sortDir = "",
         _limit = "",
         _page = "",
-        status = "",
+        isPacking,
+        isSend,
+        isValid,
+        isDone,
+        isPaid,
         searchName,
       } = req.query;
 
@@ -84,9 +97,25 @@ class TrasactionService extends Service {
       delete req.query._page;
       delete req.query._sortBy;
       delete req.query._sortDir;
+      delete req.query.isDone;
+      delete req.query.isPacking;
+      delete req.query.isSend;
+      delete req.query.isValid;
+      delete req.query.isPaid;
       delete req.query.searchName;
 
       let searchByNameClause = {};
+      let whereCondition = { ...req.query };
+      if (isPaid === "false") { whereCondition.isPaid = false }
+      if (isPaid === "true") { whereCondition.isPaid = true }
+      if (isPacking === "false") { whereCondition.isPacking = false; }
+      if (isPacking === "true") { whereCondition.isPacking = true; }
+      if (isDone === "true") { whereCondition.isPacking = true; }
+      if (isDone === "false") { whereCondition.isPacking = false; }
+      if (isSend === "true") whereCondition.isSend = true;
+      if (isSend === "false") whereCondition.isSend = false;
+      if (isValid === "true") whereCondition.isValid = true;
+      if (isValid === "false") whereCondition.isValid = false;
 
       if (searchName) {
         searchByNameClause = {
@@ -95,9 +124,7 @@ class TrasactionService extends Service {
       }
 
       const findTransactions = await Transaction.findAndCountAll({
-        where: {
-          ...req.query,
-        },
+        where: whereCondition,
         limit: _limit ? parseInt(_limit) : undefined,
         offset: (_page - 1) * _limit,
         order: _sortBy ? [[_sortBy, _sortDir]] : undefined,
