@@ -9,6 +9,7 @@ const {
   User,
   Address,
   Category,
+  Cart,
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");

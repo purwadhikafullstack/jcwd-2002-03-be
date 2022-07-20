@@ -15,6 +15,47 @@ class cartService extends Service {
               {
                 model: Product_image,
                 attributes: ["image_url"],
+                // where: {
+                //   id: 1,
+                // },
+              },
+            ],
+          },
+        ],
+      });
+      console.log(findCart);
+      return this.handleSuccess({
+        message: "get cart was successfull",
+        statusCode: 200,
+        data: findCart,
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static getCartByUserId = async (req) => {
+    try {
+      const { ProductId, UserId } = req.query;
+      const findCart = await Cart.findOne({
+        where: {
+          UserId,
+          ProductId,
+        },
+        include: [
+          {
+            model: Product,
+            attributes: ["med_name", "discount"],
+            include: [
+              {
+                model: Product_image,
+                attributes: ["image_url"],
+                where: {
+                  id: 1,
+                },
               },
             ],
           },
