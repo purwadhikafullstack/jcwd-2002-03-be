@@ -74,7 +74,6 @@ class cartService extends Service {
     try {
       const { ProductId, quantity, price } = req.body;
       const sub_total = quantity * price;
-      console.log("tokenid", req.token.id)
       const UserId = req.token.id
 
       const findCart1 = await Cart.findOne({

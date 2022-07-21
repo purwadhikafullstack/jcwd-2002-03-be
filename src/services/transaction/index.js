@@ -10,7 +10,7 @@ const {
   Address,
   Category,
 } = require("../../lib/sequelize");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");
 
 class TrasactionService extends Service {
@@ -23,7 +23,7 @@ class TrasactionService extends Service {
 
       const nomer_pesanan = nanoid(8);
 
-      if (!selectedFile) {
+      if (selectedFile.length === 0) {
         return this.handleError({
           message: "there's no picture selected",
           statusCode: 400,
@@ -37,12 +37,12 @@ class TrasactionService extends Service {
         },
       });
 
-      // if (!checkAddress) {
-      //   return this.handleError({
-      //     message: "verify success",
-      //     redirect: `http://localhost:3000/address-form`
-      //   })
-      // }
+      if (!checkAddress) {
+        return this.handleError({
+          message: "pelase set address first",
+          redirect: `${process.env.UPLOAD_FILE_DOMAIN}/address-form`
+        })
+      }
 
       const AddressId = checkAddress.dataValues.id;
 
@@ -91,7 +91,7 @@ class TrasactionService extends Service {
         searchName,
       } = req.query;
 
-      console.log("query", req.query)
+      console.log(req.query)
 
       delete req.query._limit;
       delete req.query._page;
@@ -170,6 +170,7 @@ class TrasactionService extends Service {
         ...findTransactions,
         totalPages: Math.ceil(findTransactions.count / _limit),
       };
+      console.log(result)
 
 
       return this.handleSuccess({
@@ -286,7 +287,7 @@ class TrasactionService extends Service {
   static createTransaction = async (req) => {
     try {
       const data = req.body;
-
+      const nomer_pesanan = nanoid(8)
       const UserId = req.token.id
       const checkAddress = await Address.findOne({
         where: {
@@ -296,8 +297,14 @@ class TrasactionService extends Service {
       });
       const AddressId = checkAddress.dataValues.id;
 
+      const totalPriceAllItems = data.reduce((sum, object) => {
+        return sum + object.sub_total;
+      }, 0);
+
+
       const createTransaction = await Transaction.create({
-        total_price: data.grandTotal,
+        total_price: totalPriceAllItems,
+        nomer_pesanan,
         isPaid: false,
         isPacking: false,
         isSend: false,
@@ -305,24 +312,30 @@ class TrasactionService extends Service {
         isValid: true,
         UserId,
         AddressId,
-      });
-      await Transaction_items.bulkCreate(data);
-      const findTransaction = await Transaction.findOne({
-        where: {
-          UserId,
-        },
+      })
+
+      console.log(createTransaction.dataValues.id)
+      const transactionId = createTransaction.dataValues.id
+
+      const dataWithTransactionId = data.map((val) => {
+        delete val.Product
+        return { ...val, TransactionId: transactionId }
+      })
+
+      console.log("dataTransactionwithid", dataWithTransactionId)
+
+      const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
+
+      await Payment.create({
+        TransactionId: transactionId,
+        method: "BCA VA",
       });
 
-      const TransactionId = findTransaction.dataValues.id;
-      await Payment.create({
-        TransactionId,
-        method,
-      });
-      await Cart.destroy({
-        where: {
-          id: [],
-        },
-      });
+      // await Cart.destroy({
+      //   where: {
+      //     UserId,
+      //   },
+      // });
 
       return this.handleSuccess({
         message: "transaction sumbit success",
@@ -330,10 +343,7 @@ class TrasactionService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
-        message: "Server Error",
-        statusCode: 500,
-      });
+      return this.handleError({});
     }
   };
   static approveTransaction = async (req) => {
@@ -353,6 +363,62 @@ class TrasactionService extends Service {
         statusCode: 201
       })
     } catch (err) {
+      return this.handleError({})
+    }
+  }
+  static rejectTransactionAutomaticByUserId = async (req) => {
+    try {
+      let UserId = req.token.id
+      const findTransaction = await Transaction.findAll({
+        where: {
+          UserId,
+          isValid: true
+        }
+      })
+
+      if (findTransaction.length === 0) {
+        return this.handleSuccess({
+          message: "This user has no transactions yet",
+          statusCode: 200,
+        })
+      }
+
+      const expiredTransaction = findTransaction.map((val) => {
+        const createdDate = new Date(val.dataValues.createdAt)
+        const dueDate = createdDate.setDate(createdDate.getDate() + 1)
+        if (Date.now() > dueDate) {
+          return val.dataValues.id
+        }
+      })
+
+      const filterId = expiredTransaction.filter((obj) => {
+        return obj !== undefined
+      })
+
+      if (filterId.length === 0) {
+        return this.handleSuccess({
+          message: "no expired transaction",
+          statusCode: 200,
+        })
+      }
+
+      const invalidExpired = await Transaction.update({
+        isValid: false,
+      },
+        {
+          where: {
+            id: filterId
+          }
+        }
+      )
+
+      return this.handleSuccess({
+        message: "invalid transaction expired success",
+        data: invalidExpired,
+        statusCode: 201
+      })
+    } catch (err) {
+      console.log(err)
       return this.handleError({})
     }
   }
