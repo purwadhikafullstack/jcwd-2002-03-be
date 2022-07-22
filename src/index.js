@@ -42,6 +42,9 @@ app.use(
 app.use(
   "/prescriptions", express.static(`${__dirname}/public/prescriptions`)
 )
+app.use(
+  "/payment_receipts", express.static(`${__dirname}/public/payment_receipts`)
+)
 
 // for rajaongkir request dan response
 app.use('/api', apiRoutes)

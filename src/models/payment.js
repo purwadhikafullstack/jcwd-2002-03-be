@@ -14,10 +14,6 @@ const Payment = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
         },
-        status: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
         method: {
             type: DataTypes.STRING,
             allowNull: true

@@ -4,6 +4,7 @@ const TransactionService = require("../services/transaction");
 const fileUploder = require("../lib/uploader");
 const { authorizedTokenAdmin } = require("../middlewares/authMiddlewareAdmin");
 const { authorizedToken } = require("../middlewares/authMiddleware");
+const { rejectTransaction } = require("../services/transaction");
 
 router.post(
   "/prescription",
@@ -27,11 +28,12 @@ router.post(
 );
 router.get(
   "/user-transaction",
-  // authorizedTokenAdmin,
+  authorizedToken,
   controllers(TransactionService.getAllUserTransaction)
 );
 router.post(
   "/create-transaction",
+  authorizedToken,
   controllers(TransactionService.createTransaction)
 );
 router.patch(
@@ -40,4 +42,5 @@ router.patch(
   controllers(TransactionService.approveTransaction)
 );
 
+router.patch("/reject/exp-date", authorizedToken, controllers(TransactionService.rejectTransactionAutomaticByUserId))
 module.exports = router;

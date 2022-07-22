@@ -232,10 +232,11 @@ class productService extends Service {
     try {
       const { id } = req.params;
       const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
-      const filePath = `products`;
+      const filePath = "products";
       const selectedFile = req.files;
 
-      if (!selectedFile) {
+
+      if (selectedFile.length === 0) {
         return this.handleError({
           message: "there's no picture selected",
           statusCode: 400,
@@ -258,12 +259,14 @@ class productService extends Service {
         });
       }
 
+      //data to send as response for update state
       const updateData = await Product_image.findAll({
         where: {
           ProductId: id,
         },
         attributes: ["id", "image_url"],
       });
+
       return this.handleSuccess({
         message: "upload success",
         statusCode: 201,
