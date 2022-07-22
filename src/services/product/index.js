@@ -36,10 +36,12 @@ class productService extends Service {
       let searchByNameClause = {};
 
       if (selectedProduct) {
+        console.log(selectedProduct);
         whereCategoryClause.categoryId = selectedProduct;
       }
 
       if (searchProduct) {
+        console.log(searchProduct);
         searchByNameClause = {
           med_name: { [Op.like]: `%${searchProduct}%` },
         };

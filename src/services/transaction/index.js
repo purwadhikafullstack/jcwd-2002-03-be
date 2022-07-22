@@ -223,7 +223,7 @@ class TrasactionService extends Service {
       console.log(err);
       return this.handleError({});
     }
-  }
+  };
   static getAllUserTransaction = async (req) => {
     // setiap query ato params datanya pasti string
 
@@ -341,6 +341,7 @@ class TrasactionService extends Service {
       return this.handleSuccess({
         message: "transaction sumbit success",
         statusCode: 201,
+        redirect: "http://localhost:3000/checkout",
       });
     } catch (err) {
       console.log(err);
