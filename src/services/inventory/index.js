@@ -7,6 +7,7 @@ const {
   Transaction_items,
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
+const moment = require("moment");
 
 class inventoryService extends Service {
   static addStockProduct = async (req) => {
@@ -49,7 +50,13 @@ class inventoryService extends Service {
   };
   static getSalesReport = async (req) => {
     try {
-      const { _limit = 30, _page = 1, _sortBy = "", _sortDir = "", searchProduct, } = req.query;
+      const {
+        _limit = 30,
+        _page = 1,
+        _sortBy = "",
+        _sortDir = "",
+        searchProduct,
+      } = req.query;
 
       delete req.query._limit;
       delete req.query._page;
@@ -68,7 +75,7 @@ class inventoryService extends Service {
       const findSalesReport = await Inventory.findAndCountAll({
         where: {
           ...req.query,
-        //   ...searchByNameClause,
+          //   ...searchByNameClause,
         },
         limit: _limit ? parseInt(_limit) : undefined,
         offset: (_page - 1) * _limit,
@@ -83,10 +90,10 @@ class inventoryService extends Service {
           {
             model: Product,
             where: {
-                ...req.query,
-                ...searchByNameClause,
-              },
-          }
+              ...req.query,
+              ...searchByNameClause,
+            },
+          },
         ],
       });
 
@@ -94,6 +101,90 @@ class inventoryService extends Service {
         message: "Sales report found",
         statusCode: 200,
         data: findSalesReport,
+      });
+    } catch (err) {
+      // console.log(err);
+      this.handleError({
+        message: "Server error",
+        statusCode: 500,
+      });
+    }
+  };
+  static getRevenue = async (req) => {
+    try {
+      const { filterByMonth, filterByYear } = req.query;
+
+      delete req.query.filterByMonth;
+      delete req.query.filterByYear;
+
+      let searchByMonthOrYear = {};
+
+      if (filterByMonth && filterByYear) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${filterByYear}-${moment(filterByMonth).format(
+                "MM"
+              )}-01T00:00:00.000Z`,
+              `${filterByYear}-${moment(filterByMonth)
+                .add(1, "month")
+                .format("MM")}-01T00:00:00.000Z`,
+            ],
+          },
+        };
+      } else if (filterByMonth) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${moment().format("YYYY")}-${moment(filterByMonth).format(
+                "MM"
+              )}-01T00:00:00.000Z`,
+              `${moment().format("YYYY")}-${moment(filterByMonth)
+                .add(1, "month")
+                .format("MM")}-01T00:00:00.000Z`,
+            ],
+          },
+        };
+      } else if (filterByYear) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${filterByYear}-01-01T00:00:00.000Z`,
+              `${filterByYear}-12-31T23:59:59.000Z`,
+            ],
+          },
+        };
+      }
+
+      const findOutRevenue = await Inventory.findAll({
+        where: {
+          ...searchByMonthOrYear,
+        },
+      });
+
+      const revenueOutResult = findOutRevenue.reduce(
+        (previousValue, currentValue) => {
+          return (
+            previousValue +
+            currentValue.quantity * currentValue.buying_price
+          );
+        },
+        0
+      );
+
+      const findInRevenue = await Transaction.sum("total_price", {
+        where: {
+          ...searchByMonthOrYear
+        }
+      })
+
+      return this.handleSuccess({
+        message: "Get revenue",
+        statusCode: 200,
+        data: {
+          outCome: revenueOutResult,
+          inCome: findInRevenue,
+        },
       });
     } catch (err) {
       console.log(err);

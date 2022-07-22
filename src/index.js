@@ -22,6 +22,7 @@ const {
   categoryRoutes,
   paymentRoutes,
   cartRoutes,
+  reportRoutes
 } = require("./routes");
 
 app.use("/auth", authRoutes);
@@ -45,6 +46,7 @@ app.use(
 app.use(
   "/payment_receipts", express.static(`${__dirname}/public/payment_receipts`)
 )
+app.use("/report", reportRoutes)
 
 // for rajaongkir request dan response
 app.use('/api', apiRoutes)
