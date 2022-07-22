@@ -288,6 +288,7 @@ class TrasactionService extends Service {
   static createTransaction = async (req) => {
     try {
       const data = req.body;
+      console.log("data", data)
       const nomer_pesanan = nanoid(8)
       const UserId = req.token.id
       const checkAddress = await Address.findOne({
@@ -315,7 +316,6 @@ class TrasactionService extends Service {
         AddressId,
       })
 
-      console.log(createTransaction.dataValues.id)
       const transactionId = createTransaction.dataValues.id
 
       const dataWithTransactionId = data.map((val) => {
@@ -323,14 +323,15 @@ class TrasactionService extends Service {
         return { ...val, TransactionId: transactionId }
       })
 
-      console.log("dataTransactionwithid", dataWithTransactionId)
-
+      console.log("after add trans id", dataWithTransactionId)
       const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
 
       await Payment.create({
         TransactionId: transactionId,
         method: "BCA VA",
       });
+
+      console.log(addTransactionItems)
 
       // await Cart.destroy({
       //   where: {

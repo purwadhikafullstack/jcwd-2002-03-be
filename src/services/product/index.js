@@ -9,7 +9,6 @@ const {
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 class productService extends Service {
-  // npx nodemon . --inspect
   static getProduct = async (req) => {
     try {
       const {
@@ -22,6 +21,7 @@ class productService extends Service {
         selectedProduct,
         searchProduct,
       } = req.query;
+
       delete req.query._limit;
       delete req.query._page;
       delete req.query._sortBy;
@@ -49,7 +49,6 @@ class productService extends Service {
       const findProducts = await Product.findAndCountAll({
         where: {
           ...req.query,
-          // med_name: {[Op.like]: `%${req.query.med_name}%`}
           selling_price: {
             [Op.between]: [priceMin || 0, priceMax || 999999999],
           },
