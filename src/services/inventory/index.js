@@ -172,7 +172,7 @@ class inventoryService extends Service {
         0
       );
 
-      const findInRevenue = await Transaction.sum("total_price", {
+      const findInRevenue = await Transaction_items.sum("sub_total", {
         where: {
           ...searchByMonthOrYear
         }

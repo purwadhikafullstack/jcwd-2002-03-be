@@ -9,50 +9,68 @@ const {
 } = require("../../lib/sequelize");
 const moment = require("moment");
 
-const TODAY_START = new Date().setHours(0, 0, 0, 0);
+const TODAY_START = new Date().setUTCHours(0, 0, 0, 0);
 const NOW = new Date();
 const endOfMonth = moment().endOf("month").format("YYYY-MM-DD hh:mm");
 const nextThreeMonth = moment().add(3, "months");
 
 class reportService extends Service {
-  static getTransactionCount = async (stateOfDate = "Harian") => {
+  static getTransactionCount = async (req) => {
     try {
-      let countOrder;
+      let { isSend, isValid, isDone, isPaid, isPacking } = req.body;
 
-      if (stateOfDate === "Harian") {
-        countOrder = await Transaction.count({
-          where: {
-            createdAt: {
-              [Op.gt]: TODAY_START,
-              [Op.lt]: NOW,
-            },
+      const findIsPaid = await Transaction.count({
+        where: {
+          isPaid: (isPaid = true),
+          isPacking: false,
+          createdAt: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW,
           },
-        });
-      } else if (stateOfDate === "Mingguan") {
-        countOrder = await Transaction.count({
-          where: {
-            createdAt: {
-              [Op.gt]: moment(TODAY_START).subtract(1, "week"),
-              [Op.lt]: NOW,
-            },
+        },
+      });
+
+      const findIsPacking = await Transaction.count({
+        where: {
+          isPacking: (isPacking = true),
+          isSend: false,
+          createdAt: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW,
           },
-        });
-      } else if (stateOfDate === "Bulanan") {
-        countOrder = await Transaction.count({
-          where: {
-            createdAt: {
-              [Op.gt]: moment(TODAY_START).subtract(1, "month"),
-              [Op.lt]: NOW,
-            },
+        },
+      });
+
+      const findIsSend = await Transaction.count({
+        where: {
+          isSend: (isSend = true),
+          isDone: false,
+          createdAt: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW,
           },
-        });
-      }
-      console.log(countOrder);
+        },
+      });
+
+      const findIsDone = await Transaction.count({
+        where: {
+          isDone: (isDone = true),
+          createdAt: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW,
+          },
+        },
+      });
 
       return this.handleSuccess({
         message: "Get transaction",
         statusCode: 200,
-        data: countOrder,
+        data: {
+          findIsPaid,
+          findIsPacking,
+          findIsSend,
+          findIsDone,
+        },
       });
     } catch (err) {
       console.log(err);
@@ -112,7 +130,7 @@ class reportService extends Service {
       });
     }
   };
-  static getTodayOrder = async () => {
+  static getTodayOrder = async (req) => {
     try {
       const todayOrder = await Transaction.count({
         where: {
@@ -150,7 +168,7 @@ class reportService extends Service {
       });
     }
   };
-  static getTodayStock = async () => {
+  static getTodayStock = async (req) => {
     try {
       const todayStock = await Stock_opname.findAll({
         attributes: [[Sequelize.fn("sum", Sequelize.col("amount")), "sum"]],
@@ -185,8 +203,10 @@ class reportService extends Service {
       });
     }
   };
-  static getSales = async (stateOfDate = "Bulanan") => {
+  static getSales = async (req) => {
     try {
+      const { stateOfDate = "Bulanan" } = req.body;
+
       let results, metadata;
 
       if (stateOfDate === "Mingguan") {
@@ -218,7 +238,7 @@ class reportService extends Service {
       });
     }
   };
-  static getTodayRevenue = async () => {
+  static getTodayRevenue = async (req) => {
     try {
       const todayRevenue = await Transaction_items.findAll({
         where: {
@@ -260,8 +280,10 @@ class reportService extends Service {
       });
     }
   };
-  static getProfit = async (stateOfDate = "Bulanan") => {
+  static getProfit = async (req) => {
     try {
+      const { stateOfDate = "Bulanan" } = req.body;
+
       let revenue;
       let capital;
 
@@ -271,7 +293,7 @@ class reportService extends Service {
         );
 
         const [resultCapital, metaData] = await sequelize.query(
-          "SELECT Week(createdAt), sum(buying_price * quantity) AS `sum` FROM `inventory` AS `inventory` WHERE WEEK(createdAt) GROUP BY WEEK(createdAt) ORDER BY WEEK(createdAt) ASC"
+          "SELECT Week(createdAt), sum(buying_price * quantity) AS `sum` FROM `inventories` AS `inventories` WHERE WEEK(createdAt) GROUP BY WEEK(createdAt) ORDER BY WEEK(createdAt) ASC"
         );
 
         capital = resultCapital;
@@ -283,7 +305,7 @@ class reportService extends Service {
             " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
         const [resultCapital, metaData] = await sequelize.query(
-          "SELECT createdAt as `month`, sum(buying_price * quantity) AS `sum` FROM `inventory` AS `inventory` WHERE YEAR (createdAt) = " +
+          "SELECT createdAt as `month`, sum(buying_price * quantity) AS `sum` FROM `inventories` AS `inventories` WHERE YEAR (createdAt) = " +
             moment().format("YYYY") +
             " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
@@ -296,7 +318,7 @@ class reportService extends Service {
         );
 
         const [resultCapital, metaData] = await sequelize.query(
-          "SELECT createdAt as `year`, sum(buying_price * quantity) AS `sum` FROM `inventory` AS `inventory` WHERE YEAR(createdAt) GROUP BY YEAR(createdAt) ORDER BY YEAR(createdAt) ASC"
+          "SELECT createdAt as `year`, sum(buying_price * quantity) AS `sum` FROM `inventories` AS `inventories` WHERE YEAR(createdAt) GROUP BY YEAR(createdAt) ORDER BY YEAR(createdAt) ASC"
         );
 
         capital = resultCapital;
@@ -321,8 +343,10 @@ class reportService extends Service {
       });
     }
   };
-  static getProductSold = async (ProductId, stateOfDate = "Bulanan") => {
+  static getProductSold = async (req) => {
     try {
+      const { stateOfDate = "Bulanan", ProductId } = req.body;
+
       let qtySold, yesterdayQtySold;
 
       if (stateOfDate === "Mingguan") {

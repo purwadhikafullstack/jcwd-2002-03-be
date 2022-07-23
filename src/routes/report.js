@@ -3,7 +3,7 @@ const { authorizedToken } = require("../middlewares/authMiddleware");
 const controllers = require("../middlewares/controllers");
 const reportService = require("../services/report");
 
-router.post(
+router.get(
   "/get-transaction-count",
   controllers(reportService.getTransactionCount)
 );
