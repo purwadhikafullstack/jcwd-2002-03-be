@@ -43,6 +43,10 @@ const Transaction = (sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: true,
         },
+        kurir: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     });
 };
 

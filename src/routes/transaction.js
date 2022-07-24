@@ -43,4 +43,7 @@ router.patch(
 );
 
 router.patch("/reject/exp-date", authorizedToken, controllers(TransactionService.rejectTransactionAutomaticByUserId))
+
+router.get("/items", authorizedToken, controllers(TransactionService.getTransactionItems))
+
 module.exports = router;

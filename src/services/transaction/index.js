@@ -94,8 +94,6 @@ class TrasactionService extends Service {
         searchName,
       } = req.query;
 
-      console.log(req.query)
-
       delete req.query._limit;
       delete req.query._page;
       delete req.query._sortBy;
@@ -326,11 +324,12 @@ class TrasactionService extends Service {
 
       const dataWithTransactionId = data.map((val) => {
         delete val.Product
-        return { ...val, TransactionId: transactionId }
+        return { ...val, TransactionId: transactionId, type: "keluar" }
       })
 
       const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
 
+      // decrement every stock opname
       dataWithTransactionId.forEach(async (val) => {
         await Stock_opname.increment({
           amount: val.quantity * -1
@@ -341,10 +340,12 @@ class TrasactionService extends Service {
         })
       })
 
+      const createLog = await Inventory.bulkCreate(dataWithTransactionId)
+
       return this.handleSuccess({
         message: "transaction sumbit success",
         statusCode: 201,
-        redirect: "http://localhost:3000/checkout",
+        data: transactionId
       });
     } catch (err) {
       console.log(err);
@@ -424,6 +425,35 @@ class TrasactionService extends Service {
       })
     } catch (err) {
       console.log(err)
+      return this.handleError({})
+    }
+  }
+  static getTransactionItems = async (req) => {
+    try {
+      const { id } = req.query
+      const UserId = req.token.id
+      console.log(req.query)
+      console.log(id)
+
+      delete req.query.id
+
+      const getData = await Transaction.findOne({
+        where: { id: parseInt(id), UserId },
+        include: [
+          {
+            model: Transaction_items,
+          },
+        ]
+      })
+      console.log(getData)
+
+      return this.handleSuccess({
+        data: getData,
+        message: "get data success",
+        statusCode: 200
+      })
+
+    } catch (err) {
       return this.handleError({})
     }
   }
