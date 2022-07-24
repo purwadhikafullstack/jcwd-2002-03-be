@@ -51,6 +51,7 @@ class PaymentService extends Service {
             return this.handleError({})
         }
     }
+
 }
 
 module.exports = PaymentService

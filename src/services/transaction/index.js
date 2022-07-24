@@ -10,6 +10,8 @@ const {
   Address,
   Category,
   Cart,
+  Inventory,
+  Stock_opname
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");
@@ -288,21 +290,25 @@ class TrasactionService extends Service {
   static createTransaction = async (req) => {
     try {
       const data = req.body;
-      console.log("data", data)
       const nomer_pesanan = nanoid(8)
       const UserId = req.token.id
-      const checkAddress = await Address.findOne({
-        where: {
-          UserId,
-          main_address: true,
-        },
-      });
-      const AddressId = checkAddress.dataValues.id;
 
+      const cardId = data.map(val => val.id)
+
+      // destroy cart
+      const destroyCart = await Cart.destroy({
+        where: {
+          id: cardId
+        }
+      })
+
+      // delete all cartId in data 
+      data.forEach((val) => delete val.id)
+
+      // sum all sub_total transaction items
       const totalPriceAllItems = data.reduce((sum, object) => {
         return sum + object.sub_total;
       }, 0);
-
 
       const createTransaction = await Transaction.create({
         total_price: totalPriceAllItems,
@@ -313,7 +319,7 @@ class TrasactionService extends Service {
         isDone: false,
         isValid: true,
         UserId,
-        AddressId,
+        ongkos_kirim: 0
       })
 
       const transactionId = createTransaction.dataValues.id
@@ -323,21 +329,17 @@ class TrasactionService extends Service {
         return { ...val, TransactionId: transactionId }
       })
 
-      console.log("after add trans id", dataWithTransactionId)
       const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
 
-      await Payment.create({
-        TransactionId: transactionId,
-        method: "BCA VA",
-      });
-
-      console.log(addTransactionItems)
-
-      // await Cart.destroy({
-      //   where: {
-      //     UserId,
-      //   },
-      // });
+      dataWithTransactionId.forEach(async (val) => {
+        await Stock_opname.increment({
+          amount: val.quantity * -1
+        }, {
+          where: {
+            id: val.ProductId
+          }
+        })
+      })
 
       return this.handleSuccess({
         message: "transaction sumbit success",

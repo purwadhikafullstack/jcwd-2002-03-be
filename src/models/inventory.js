@@ -16,7 +16,7 @@ const Inventory = (sequelize) => {
     },
     expired_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     type: {
       type: DataTypes.STRING,

@@ -14,7 +14,6 @@ class inventoryService extends Service {
     try {
       const { quantity, expired_date, ProductId, buying_price, type } =
         req.body;
-      console.log(req.body);
 
       const addStock = await Inventory.create({
         quantity,

@@ -1,9 +1,8 @@
 const Service = require("../service");
-const { User, Cart, Product, Product_image } = require("../../lib/sequelize");
+const { User, Cart, Product, Product_image, Stock_opname } = require("../../lib/sequelize");
 class cartService extends Service {
   static getCart = async (req) => {
     try {
-
       const findCart = await Cart.findAndCountAll({
         where: {
           UserId: req.token.id,
@@ -16,6 +15,9 @@ class cartService extends Service {
                 model: Product_image,
                 attributes: ["image_url"],
               },
+              {
+                model: Stock_opname,
+              }
             ],
           },
         ],
@@ -132,7 +134,6 @@ class cartService extends Service {
   static deleteCart = async (req) => {
     try {
       const { id } = req.params;
-      // console.log(id);
 
       await Cart.destroy({
         where: {
