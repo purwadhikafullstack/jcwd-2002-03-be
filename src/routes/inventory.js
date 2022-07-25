@@ -5,5 +5,6 @@ const inventoryService = require("../services/inventory")
 
 router.post("/add-stock", authorizedToken, controllers(inventoryService.addStockProduct))
 router.get("/sales-report", controllers(inventoryService.getSalesReport))
+router.get("/revenue", controllers(inventoryService.getRevenue))
 
 module.exports = router
