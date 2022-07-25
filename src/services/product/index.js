@@ -1,4 +1,3 @@
-
 const Service = require("../service");
 const {
   Product,
@@ -129,6 +128,7 @@ class productService extends Service {
           },
         ],
       });
+      console.log(findProduct);
       return this.handleSuccess({
         message: "Product found successfully",
         statusCode: 200,
@@ -207,8 +207,8 @@ class productService extends Service {
       });
 
       const addStockOpname = await Stock_opname.create({
-        ProductId: inputProduct.dataValues.id
-      })
+        ProductId: inputProduct.dataValues.id,
+      });
 
       const result = await Product.findOne({
         where: {
@@ -236,7 +236,6 @@ class productService extends Service {
       const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
       const filePath = "products";
       const selectedFile = req.files;
-
 
       if (selectedFile.length === 0) {
         return this.handleError({
@@ -387,4 +386,3 @@ class productService extends Service {
   };
 }
 module.exports = productService;
-

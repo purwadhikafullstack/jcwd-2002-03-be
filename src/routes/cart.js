@@ -5,7 +5,11 @@ const cartService = require("../services/cart");
 
 router.post("/", authorizedToken, controllers(cartService.addToCart));
 router.get("/", authorizedToken, controllers(cartService.getCart));
-// router.get("/", controllers(cartService.getCartByUserId));
+router.get(
+  "/detail",
+  authorizedToken,
+  controllers(cartService.getCartByUserId)
+);
 router.delete("/:id", controllers(cartService.deleteCart));
 
 module.exports = router;
