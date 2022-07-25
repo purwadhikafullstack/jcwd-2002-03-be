@@ -9,6 +9,7 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 
 // Router GET province
 router.get('/provinsi', (req, res) => {
+    console.log("call api province")
     axios.get('/province')
         .then(response => res.json(response.data))
         .catch(err => res.send(err))
@@ -16,7 +17,9 @@ router.get('/provinsi', (req, res) => {
 
 // Router GET city by province_id
 router.get('/kota/:provId', (req, res) => {
+    console.log("call api city")
     const id = req.params.provId
+    console.log("call api")
     axios.get(`/city?province=${id}`)
         .then(response => res.json(response.data))
         .catch(err => res.send(err))
@@ -24,6 +27,7 @@ router.get('/kota/:provId', (req, res) => {
 
 // Router GET costs
 router.get('/ongkos/:asal/:tujuan/:berat/:kurir', (req, res) => {
+    console.log("call api ongkir")
     const param = req.params
     axios.post('/cost', {
         origin: param.asal,

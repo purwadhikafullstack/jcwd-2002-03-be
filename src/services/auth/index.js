@@ -126,7 +126,7 @@ class authService extends Service {
 
       return this.handleSuccess({
         message: "verify success",
-        redirect: `http://localhost:3000/verification`
+        redirect: `${process.env.BASE_URL}/verification`
       })
     } catch (err) {
       console.log(err);

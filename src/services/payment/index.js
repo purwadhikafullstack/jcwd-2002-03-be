@@ -1,4 +1,4 @@
-const { Payment } = require("../../lib/sequelize")
+const { Payment, Transaction } = require("../../lib/sequelize")
 const Service = require("../service")
 
 class PaymentService extends Service {
@@ -45,6 +45,35 @@ class PaymentService extends Service {
                 message: "upload payment receipt success",
                 statusCode: 201,
                 data: createPayment
+            })
+        } catch (err) {
+            console.log(err)
+            return this.handleError({})
+        }
+    }
+    static createPayment = async (req) => {
+        try {
+            const { ongkos_kirim, AddressId, kurir, TransactionId } = req.body
+            console.log(req.body)
+
+            const updateongkirAndAddress = await Transaction.update({
+                ongkos_kirim,
+                AddressId,
+                kurir
+            }, {
+                where: {
+                    id: TransactionId
+                }
+            })
+
+            const payment = await Payment.create({
+                methode: "BCA VA",
+                TransactionId
+            })
+
+            return this.handleSuccess({
+                message: "Pilih Pembayaran Berhasil",
+                statusCode: 201,
             })
         } catch (err) {
             console.log(err)
