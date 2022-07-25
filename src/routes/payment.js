@@ -12,6 +12,6 @@ router.patch("/:TransactionId/payment-image",
         prefix: "POST"
     }).single("payment_receipts"), controllers(PaymentService.addPaymentReceipt))
 
-router.post("/payment", authorizedToken, controllers(PaymentService.createPayment))
+router.post("/create", authorizedToken, controllers(PaymentService.createPayment))
 
 module.exports = router

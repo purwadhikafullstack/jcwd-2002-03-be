@@ -171,8 +171,6 @@ class TrasactionService extends Service {
         ...findTransactions,
         totalPages: Math.ceil(findTransactions.count / _limit),
       };
-      console.log(result)
-
 
       return this.handleSuccess({
         message: "get all product success",
@@ -432,8 +430,6 @@ class TrasactionService extends Service {
     try {
       const { id } = req.query
       const UserId = req.token.id
-      console.log(req.query)
-      console.log(id)
 
       delete req.query.id
 
@@ -442,10 +438,15 @@ class TrasactionService extends Service {
         include: [
           {
             model: Transaction_items,
+            include: {
+              model: Product,
+              include: {
+                model: Product_image
+              }
+            }
           },
         ]
       })
-      console.log(getData)
 
       return this.handleSuccess({
         data: getData,
@@ -455,6 +456,33 @@ class TrasactionService extends Service {
 
     } catch (err) {
       return this.handleError({})
+    }
+  }
+  static cancelTransaction = async (req) => {
+    try {
+      const data = req.body
+      const AdminId = req.token.id
+
+      const validatingTransaction = await Transaction.update({ isValid: false, AdminId }, { where: { id: data.id } })
+
+      data.Transaction_items.forEach(async (val) => {
+        await Stock_opname.increment({ amount: val.quantity, }, { where: { ProductId: val.ProductId } })
+        await Inventory.create({
+          quantity: val.quantity,
+          type: "masuk",
+          ProductId: val.ProductId,
+          TransactionId: val.TransactionId,
+          AdminId
+        })
+      })
+
+      return this.handleSuccess({
+        message: "Transaction canceled",
+        statusCode: 201
+      })
+    } catch (err) {
+      return this.handleError({})
+
     }
   }
 }

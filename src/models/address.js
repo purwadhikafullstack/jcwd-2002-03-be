@@ -52,10 +52,6 @@ const Address = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    kurir: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
   });
 };
 

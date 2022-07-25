@@ -171,6 +171,8 @@ class profileService extends Service {
         alamat,
         kodePos,
         main_address,
+        city_id,
+        province_id
       } = req.body;
       const UserId = req.token.id;
 
@@ -205,6 +207,8 @@ class profileService extends Service {
         kodePos,
         UserId,
         main_address,
+        city_id,
+        province_id
       });
       return this.handleSuccess({
         message: "your address was added successfully",
@@ -303,5 +307,26 @@ class profileService extends Service {
       });
     }
   };
+
+  static deleteAlamat = async (req) => {
+    try {
+      const { id } = req.params
+      const UserId = req.token.id
+      await Address.destroy({
+        where: {
+          id,
+          UserId
+        }
+      })
+
+      return this.handleSuccess({
+        message: "delete address success",
+        statusCode: 201,
+      })
+
+    } catch (err) {
+      return this.handleError({})
+    }
+  }
 }
 module.exports = profileService;

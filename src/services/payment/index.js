@@ -53,9 +53,8 @@ class PaymentService extends Service {
     }
     static createPayment = async (req) => {
         try {
-            const { ongkos_kirim, AddressId, kurir } = req.body
-            const { TransactionId } = req.query
-            delete req.query.TransactionId
+            const { ongkos_kirim, AddressId, kurir, TransactionId } = req.body
+            console.log(req.body)
 
             const updateongkirAndAddress = await Transaction.update({
                 ongkos_kirim,
@@ -68,7 +67,7 @@ class PaymentService extends Service {
             })
 
             const payment = await Payment.create({
-                methode,
+                methode: "BCA VA",
                 TransactionId
             })
 
@@ -77,6 +76,7 @@ class PaymentService extends Service {
                 statusCode: 201,
             })
         } catch (err) {
+            console.log(err)
             return this.handleError({})
         }
     }
