@@ -19,7 +19,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -62,7 +62,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -88,7 +88,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -116,7 +116,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -152,7 +152,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -170,24 +170,27 @@ class profileService extends Service {
         kecamatan,
         alamat,
         kodePos,
-        main_address
+        main_address,
       } = req.body;
-      const UserId = req.token.id
+      const UserId = req.token.id;
 
       // function to check if user already set main_address , in other addres id
       if (main_address === true) {
         const checkMainAddress = await Address.findAll({
           where: {
             UserId,
-            main_address: true
-          }
-        })
+            main_address: true,
+          },
+        });
 
         // if userAlready set main_address in other address id, then turn it into false
         if (checkMainAddress.length !== 0) {
-          await Address.update({
-            main_address: false
-          }, { where: { id: checkMainAddress[0].dataValues.id } })
+          await Address.update(
+            {
+              main_address: false,
+            },
+            { where: { id: checkMainAddress[0].dataValues.id } }
+          );
         }
       }
 
@@ -201,7 +204,7 @@ class profileService extends Service {
         alamat,
         kodePos,
         UserId,
-        main_address
+        main_address,
       });
       return this.handleSuccess({
         message: "your address was added successfully",
@@ -210,7 +213,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -225,7 +228,7 @@ class profileService extends Service {
         },
         {
           where: {
-            id: req.token.id
+            id: req.token.id,
           },
         }
       );
@@ -236,7 +239,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -246,7 +249,7 @@ class profileService extends Service {
     try {
       const address = await User.findAndCountAll({
         where: {
-          id: req.token.id
+          id: req.token.id,
         },
         include: [
           {
@@ -272,7 +275,7 @@ class profileService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -284,19 +287,20 @@ class profileService extends Service {
         where: {
           UserId: req.token.id,
           // main_address: true
-        }
-      })
+        },
+      });
 
       return this.handleSuccess({
         message: "get address by user id success",
         statusCode: 200,
-        data: findAddress
-      })
-
+        data: findAddress,
+      });
     } catch (err) {
-      console.log(err)
-      return this.handleError({})
-
+      console.log(err);
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
     }
   };
 }

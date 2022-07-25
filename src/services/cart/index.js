@@ -27,49 +27,55 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
     }
   };
-  // static getCartByUserId = async (req) => {
-  //   try {
-  //     const { ProductId, UserId } = req.query;
-  //     const findCart = await Cart.findOne({
-  //       where: {
-  //         UserId,
-  //         ProductId,
-  //       },
-  //       include: [
-  //         {
-  //           model: Product,
-  //           attributes: ["med_name", "discount"],
-  //           include: [
-  //             {
-  //               model: Product_image,
-  //               attributes: ["image_url"],
-  //               where: {
-  //                 id: 1,
-  //               },
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //     });
-  //     return this.handleSuccess({
-  //       message: "get cart was successfull",
-  //       statusCode: 200,
-  //       data: findCart,
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //     this.handleError({
-  //       message: "Server Error",
-  //       statusCode: 500,
-  //     });
-  //   }
-  // };
+  static getCartByUserId = async (req) => {
+    try {
+      const { ProductId, UserId } = req.query;
+      const findCart = await Cart.findOne({
+        where: {
+          UserId,
+          ProductId,
+        },
+        include: [
+          {
+            model: Product,
+            attributes: ["med_name", "discount"],
+            include: [
+              {
+                model: Product_image,
+                attributes: ["image_url"],
+                where: {
+                  id: 1,
+                },
+              },
+            ],
+          },
+        ],
+      });
+      if (!findCart) {
+        return this.handleError({
+          message: "no product in cart",
+          statusCode: 500,
+        });
+      }
+      return this.handleSuccess({
+        message: "get cart was successfull",
+        statusCode: 200,
+        data: findCart,
+      });
+    } catch (err) {
+      console.log(err);
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
   static addToCart = async (req) => {
     try {
       const { ProductId, quantity, price } = req.body;
@@ -117,7 +123,7 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -140,7 +146,7 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
