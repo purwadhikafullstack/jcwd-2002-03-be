@@ -6,6 +6,9 @@ const {
   Stock_opname,
   sequelize,
   Transaction_items,
+  Product,
+  Admin,
+  Product_image,
 } = require("../../lib/sequelize");
 const moment = require("moment");
 
@@ -435,6 +438,133 @@ class reportService extends Service {
     } catch (err) {
       console.log(err);
       return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
+  static getProductStock = async (req) => {
+    try {
+      const { id } = req.params;
+
+      const {
+        _limit = 10,
+        _page = 1,
+        filterByMonth,
+        filterByYear,
+        filterByActivity,
+      } = req.query;
+
+      delete req.query._limit;
+      delete req.query._page;
+      delete req.query.filterByMonth;
+      delete req.query.filterByYear;
+      delete req.query.filterByActivity;
+
+      let searchByMonthOrYear = {};
+      let whereActivityClause = {};
+
+      if (filterByMonth && filterByYear) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${filterByYear}-${moment(filterByMonth).format(
+                "MM"
+              )}-01T00:00:00.000Z`,
+              `${filterByYear}-${moment(filterByMonth)
+                .add(1, "month")
+                .format("MM")}-01T00:00:00.000Z`,
+            ],
+          },
+        };
+      } else if (filterByMonth) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${moment().format("YYYY")}-${moment(filterByMonth).format(
+                "MM"
+              )}-01T00:00:00.000Z`,
+              `${moment().format("YYYY")}-${moment(filterByMonth)
+                .add(1, "month")
+                .format("MM")}-01T00:00:00.000Z`,
+            ],
+          },
+        };
+      } else if (filterByYear) {
+        searchByMonthOrYear = {
+          createdAt: {
+            [Op.between]: [
+              `${filterByYear}-01-01T00:00:00.000Z`,
+              `${filterByYear}-12-31T23:59:59.000Z`,
+            ],
+          },
+        };
+      }
+
+      if (filterByActivity) {
+        whereActivityClause = {
+          type: {
+            [Op.like]: `%${filterByActivity}%`,
+          },
+        };
+      }
+
+      const findProduct = await Product.findByPk(id, {
+        include: [
+          {
+            model: Product_image,
+            attributes: ["image_url"],
+          },
+          {
+            model: Inventory,
+            where: {
+              ...req.query,
+              ...searchByMonthOrYear,
+              ...whereActivityClause,
+            },
+            limit: _limit ? parseInt(_limit) : undefined,
+            offset: (_page - 1) * _limit,
+            distinct: true,
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Admin,
+              },
+              {
+                model: Product,
+                attributes: ["selling_price"],
+                include: Stock_opname,
+              },
+            ],
+          },
+        ],
+      });
+
+      const countData = await Product.findByPk(id, {
+        attributes: ["id"],
+        include: [
+          {
+            model: Inventory,
+            attributes: [
+              [Sequelize.fn("COUNT", Sequelize.col("quantity")), "count"],
+            ],
+          },
+        ],
+      });
+
+      const count = countData.inventories[0];
+
+      return this.handleSuccess({
+        message: "Product found successfully",
+        statusCode: 200,
+        data: {
+          findProduct,
+          count,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
