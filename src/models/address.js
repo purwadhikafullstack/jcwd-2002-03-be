@@ -44,6 +44,14 @@ const Address = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    province_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    city_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   });
 };
 

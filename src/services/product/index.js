@@ -1,4 +1,3 @@
-
 const Service = require("../service");
 const {
   Product,
@@ -10,7 +9,6 @@ const {
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 class productService extends Service {
-  // npx nodemon . --inspect
   static getProduct = async (req) => {
     try {
       const {
@@ -23,6 +21,7 @@ class productService extends Service {
         selectedProduct,
         searchProduct,
       } = req.query;
+
       delete req.query._limit;
       delete req.query._page;
       delete req.query._sortBy;
@@ -36,10 +35,12 @@ class productService extends Service {
       let searchByNameClause = {};
 
       if (selectedProduct) {
+        console.log(selectedProduct);
         whereCategoryClause.categoryId = selectedProduct;
       }
 
       if (searchProduct) {
+        console.log(searchProduct);
         searchByNameClause = {
           med_name: { [Op.like]: `%${searchProduct}%` },
         };
@@ -48,7 +49,6 @@ class productService extends Service {
       const findProducts = await Product.findAndCountAll({
         where: {
           ...req.query,
-          // med_name: {[Op.like]: `%${req.query.med_name}%`}
           selling_price: {
             [Op.between]: [priceMin || 0, priceMax || 999999999],
           },
@@ -127,6 +127,7 @@ class productService extends Service {
           },
         ],
       });
+      console.log(findProduct);
       return this.handleSuccess({
         message: "Product found successfully",
         statusCode: 200,
@@ -205,8 +206,8 @@ class productService extends Service {
       });
 
       const addStockOpname = await Stock_opname.create({
-        ProductId: inputProduct.dataValues.id
-      })
+        ProductId: inputProduct.dataValues.id,
+      });
 
       const result = await Product.findOne({
         where: {
@@ -234,7 +235,6 @@ class productService extends Service {
       const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN;
       const filePath = "products";
       const selectedFile = req.files;
-
 
       if (selectedFile.length === 0) {
         return this.handleError({
@@ -385,4 +385,3 @@ class productService extends Service {
   };
 }
 module.exports = productService;
-

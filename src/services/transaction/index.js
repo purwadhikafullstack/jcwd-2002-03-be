@@ -9,6 +9,9 @@ const {
   User,
   Address,
   Category,
+  Cart,
+  Inventory,
+  Stock_opname
 } = require("../../lib/sequelize");
 const { Op } = require("sequelize");
 const { nanoid } = require("nanoid");
@@ -91,8 +94,6 @@ class TrasactionService extends Service {
         searchName,
       } = req.query;
 
-      console.log(req.query)
-
       delete req.query._limit;
       delete req.query._page;
       delete req.query._sortBy;
@@ -170,8 +171,6 @@ class TrasactionService extends Service {
         ...findTransactions,
         totalPages: Math.ceil(findTransactions.count / _limit),
       };
-      console.log(result)
-
 
       return this.handleSuccess({
         message: "get all product success",
@@ -222,7 +221,7 @@ class TrasactionService extends Service {
       console.log(err);
       return this.handleError({});
     }
-  }
+  };
   static getAllUserTransaction = async (req) => {
     // setiap query ato params datanya pasti string
 
@@ -289,18 +288,23 @@ class TrasactionService extends Service {
       const data = req.body;
       const nomer_pesanan = nanoid(8)
       const UserId = req.token.id
-      const checkAddress = await Address.findOne({
-        where: {
-          UserId,
-          main_address: true,
-        },
-      });
-      const AddressId = checkAddress.dataValues.id;
 
+      const cardId = data.map(val => val.id)
+
+      // destroy cart
+      const destroyCart = await Cart.destroy({
+        where: {
+          id: cardId
+        }
+      })
+
+      // delete all cartId in data 
+      data.forEach((val) => delete val.id)
+
+      // sum all sub_total transaction items
       const totalPriceAllItems = data.reduce((sum, object) => {
         return sum + object.sub_total;
       }, 0);
-
 
       const createTransaction = await Transaction.create({
         total_price: totalPriceAllItems,
@@ -311,35 +315,35 @@ class TrasactionService extends Service {
         isDone: false,
         isValid: true,
         UserId,
-        AddressId,
+        ongkos_kirim: 0
       })
 
-      console.log(createTransaction.dataValues.id)
       const transactionId = createTransaction.dataValues.id
 
       const dataWithTransactionId = data.map((val) => {
         delete val.Product
-        return { ...val, TransactionId: transactionId }
+        return { ...val, TransactionId: transactionId, type: "keluar" }
       })
-
-      console.log("dataTransactionwithid", dataWithTransactionId)
 
       const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
 
-      await Payment.create({
-        TransactionId: transactionId,
-        method: "BCA VA",
-      });
+      // decrement every stock opname
+      dataWithTransactionId.forEach(async (val) => {
+        await Stock_opname.increment({
+          amount: val.quantity * -1
+        }, {
+          where: {
+            id: val.ProductId
+          }
+        })
+      })
 
-      // await Cart.destroy({
-      //   where: {
-      //     UserId,
-      //   },
-      // });
+      const createLog = await Inventory.bulkCreate(dataWithTransactionId)
 
       return this.handleSuccess({
         message: "transaction sumbit success",
         statusCode: 201,
+        data: transactionId
       });
     } catch (err) {
       console.log(err);
@@ -420,6 +424,65 @@ class TrasactionService extends Service {
     } catch (err) {
       console.log(err)
       return this.handleError({})
+    }
+  }
+  static getTransactionItems = async (req) => {
+    try {
+      const { id } = req.query
+      const UserId = req.token.id
+
+      delete req.query.id
+
+      const getData = await Transaction.findOne({
+        where: { id: parseInt(id), UserId },
+        include: [
+          {
+            model: Transaction_items,
+            include: {
+              model: Product,
+              include: {
+                model: Product_image
+              }
+            }
+          },
+        ]
+      })
+
+      return this.handleSuccess({
+        data: getData,
+        message: "get data success",
+        statusCode: 200
+      })
+
+    } catch (err) {
+      return this.handleError({})
+    }
+  }
+  static cancelTransaction = async (req) => {
+    try {
+      const data = req.body
+      const AdminId = req.token.id
+
+      const validatingTransaction = await Transaction.update({ isValid: false, AdminId }, { where: { id: data.id } })
+
+      data.Transaction_items.forEach(async (val) => {
+        await Stock_opname.increment({ amount: val.quantity, }, { where: { ProductId: val.ProductId } })
+        await Inventory.create({
+          quantity: val.quantity,
+          type: "masuk",
+          ProductId: val.ProductId,
+          TransactionId: val.TransactionId,
+          AdminId
+        })
+      })
+
+      return this.handleSuccess({
+        message: "Transaction canceled",
+        statusCode: 201
+      })
+    } catch (err) {
+      return this.handleError({})
+
     }
   }
 }

@@ -1,9 +1,8 @@
 const Service = require("../service");
-const { User, Cart, Product, Product_image } = require("../../lib/sequelize");
+const { User, Cart, Product, Product_image, Stock_opname } = require("../../lib/sequelize");
 class cartService extends Service {
   static getCart = async (req) => {
     try {
-
       const findCart = await Cart.findAndCountAll({
         where: {
           UserId: req.token.id,
@@ -16,6 +15,9 @@ class cartService extends Service {
                 model: Product_image,
                 attributes: ["image_url"],
               },
+              {
+                model: Stock_opname,
+              }
             ],
           },
         ],
@@ -27,49 +29,55 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
     }
   };
-  // static getCartByUserId = async (req) => {
-  //   try {
-  //     const { ProductId, UserId } = req.query;
-  //     const findCart = await Cart.findOne({
-  //       where: {
-  //         UserId,
-  //         ProductId,
-  //       },
-  //       include: [
-  //         {
-  //           model: Product,
-  //           attributes: ["med_name", "discount"],
-  //           include: [
-  //             {
-  //               model: Product_image,
-  //               attributes: ["image_url"],
-  //               where: {
-  //                 id: 1,
-  //               },
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //     });
-  //     return this.handleSuccess({
-  //       message: "get cart was successfull",
-  //       statusCode: 200,
-  //       data: findCart,
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //     this.handleError({
-  //       message: "Server Error",
-  //       statusCode: 500,
-  //     });
-  //   }
-  // };
+  static getCartByUserId = async (req) => {
+    try {
+      const { ProductId, UserId } = req.query;
+      const findCart = await Cart.findOne({
+        where: {
+          UserId,
+          ProductId,
+        },
+        include: [
+          {
+            model: Product,
+            attributes: ["med_name", "discount"],
+            include: [
+              {
+                model: Product_image,
+                attributes: ["image_url"],
+                where: {
+                  id: 1,
+                },
+              },
+            ],
+          },
+        ],
+      });
+      if (!findCart) {
+        return this.handleError({
+          message: "no product in cart",
+          statusCode: 500,
+        });
+      }
+      return this.handleSuccess({
+        message: "get cart was successfull",
+        statusCode: 200,
+        data: findCart,
+      });
+    } catch (err) {
+      console.log(err);
+      return this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
+    }
+  };
   static addToCart = async (req) => {
     try {
       const { ProductId, quantity, price } = req.body;
@@ -117,7 +125,7 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });
@@ -126,7 +134,6 @@ class cartService extends Service {
   static deleteCart = async (req) => {
     try {
       const { id } = req.params;
-      // console.log(id);
 
       await Cart.destroy({
         where: {
@@ -140,7 +147,7 @@ class cartService extends Service {
       });
     } catch (err) {
       console.log(err);
-      this.handleError({
+      return this.handleError({
         message: "Server Error",
         statusCode: 500,
       });

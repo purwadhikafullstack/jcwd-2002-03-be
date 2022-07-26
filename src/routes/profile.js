@@ -20,5 +20,6 @@ router.post("/tambahTl", controllers(profileService.tambahTl));
 router.get("/", controllers(profileService.getMyProfile));
 router.get("/address", authorizedToken, controllers(profileService.getAddress));
 router.get("/address-user", authorizedToken, controllers(profileService.getAddressByUserId));
+router.delete("/address/:id/delete", authorizedToken, controllers(profileService.deleteAlamat))
 
 module.exports = router;

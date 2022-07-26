@@ -39,6 +39,14 @@ const Transaction = (sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
         },
+        ongkos_kirim: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        kurir: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     });
 };
 
