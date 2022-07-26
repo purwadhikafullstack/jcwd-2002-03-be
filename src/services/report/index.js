@@ -65,6 +65,20 @@ class reportService extends Service {
         },
       });
 
+      const findCancelOrder = await Transaction.count({
+        where: {
+          isValid: (isValid = false),
+          isPaid: false,
+          isPacking: false,
+          isSend: false,
+          isDone: false,
+          createdAt: {
+            [Op.gt]: TODAY_START,
+            [Op.lt]: NOW,
+          },
+        },
+      });
+
       return this.handleSuccess({
         message: "Get transaction",
         statusCode: 200,
@@ -73,6 +87,7 @@ class reportService extends Service {
           findIsPacking,
           findIsSend,
           findIsDone,
+          findCancelOrder,
         },
       });
     } catch (err) {
@@ -570,6 +585,40 @@ class reportService extends Service {
       });
     }
   };
+  static getCancelOrder = async (req) => {
+    try {
+        const { stateOfDate = "Bulanan" } = req.body;
+
+        let results, metadata;
+
+      if (stateOfDate === "Mingguan") {
+        [results, metadata] = await sequelize.query(
+          "SELECT WEEK(createdAt) as `week`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY WEEK(createdAt) ORDER BY WEEK(createdAt) ASC"
+        );
+      } else if (stateOfDate === "Bulanan") {
+        [results, metadata] = await sequelize.query(
+          "SELECT createdAt as `month`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 AND YEAR (createdAt) = " +
+            moment().format("YYYY") +
+            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+        );
+      } else if (stateOfDate === "Tahunan") {
+        [results, metadata] = await sequelize.query(
+          "SELECT createdAt as `year`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY YEAR(createdAt) ORDER BY YEAR(createdAt) ASC"
+        );
+      }
+      return this.handleSuccess({
+        message: "Cancel transaction found",
+        statusCode: 200,
+        data: results,
+      });
+    } catch (err) {
+        console.log(err);
+        this.handleError({
+          message: "Server Error",
+          statusCode: 500,
+        }); 
+    }
+  }
 }
 
 module.exports = reportService;
