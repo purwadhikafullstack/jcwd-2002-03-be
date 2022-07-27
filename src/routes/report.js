@@ -14,5 +14,6 @@ router.post("/get-sales", controllers(reportService.getSales));
 router.get("/get-today-revenue", controllers(reportService.getTodayRevenue));
 router.post("/get-profit", controllers(reportService.getProfit));
 router.post("/get-product-qty-sold", controllers(reportService.getProductSold))
+router.get("/get-product-stock-history/:id", controllers(reportService.getProductStock))
 
 module.exports = router;
