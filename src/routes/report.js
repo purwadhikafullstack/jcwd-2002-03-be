@@ -3,7 +3,7 @@ const { authorizedToken } = require("../middlewares/authMiddleware");
 const controllers = require("../middlewares/controllers");
 const reportService = require("../services/report");
 
-router.get(
+router.post(
   "/get-transaction-count",
   controllers(reportService.getTransactionCount)
 );
@@ -15,5 +15,6 @@ router.get("/get-today-revenue", controllers(reportService.getTodayRevenue));
 router.post("/get-profit", controllers(reportService.getProfit));
 router.post("/get-product-qty-sold", controllers(reportService.getProductSold))
 router.get("/get-product-stock-history/:id", controllers(reportService.getProductStock))
+router.post("/get-cancel-order", controllers(reportService.getCancelOrder))
 
 module.exports = router;
