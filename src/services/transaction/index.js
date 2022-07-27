@@ -33,22 +33,6 @@ class TrasactionService extends Service {
         });
       }
 
-      const checkAddress = await Address.findOne({
-        where: {
-          UserId,
-          main_address: true,
-        },
-      });
-
-      if (!checkAddress) {
-        return this.handleError({
-          message: "pelase set address first",
-          redirect: `${process.env.UPLOAD_FILE_DOMAIN}/address-form`
-        })
-      }
-
-      const AddressId = checkAddress.dataValues.id;
-
       const buy = await Transaction.create({
         isValid: true,
         nomer_pesanan,
@@ -58,7 +42,6 @@ class TrasactionService extends Service {
         isSend: false,
         isPacking: false,
         UserId,
-        AddressId,
       });
 
       const data = selectedFile.map((val) => {
@@ -73,6 +56,7 @@ class TrasactionService extends Service {
       return this.handleSuccess({
         message: "transaction sumbit success",
         statusCode: 201,
+        data: buy
       });
     } catch (err) {
       console.log(err);
@@ -187,10 +171,15 @@ class TrasactionService extends Service {
       const data = req.body;
       const addTransactionItems = await Transaction_items.bulkCreate(data);
 
-      const totalPriceAllItems = data.reduce((sum, object) => {
+      const findAllTransactionItems = await Transaction_items.findAll({
+        where: {
+          TransactionId: data[0].TransactionId
+        }
+      })
+
+      const totalPriceAllItems = findAllTransactionItems.reduce((sum, object) => {
         return sum + object.sub_total;
       }, 0);
-
 
       const updateTrasactions = await Transaction.update(
         {
@@ -205,6 +194,21 @@ class TrasactionService extends Service {
         }
       );
 
+      data.forEach(async (val) => {
+        await Stock_opname.increment({
+          amount: val.quantity * -1
+        }, {
+          where: {
+            id: val.ProductId
+          }
+        })
+      })
+
+      const dataWithType = data.map((val) => {
+        return { ...val, type: "keluar" }
+      })
+
+      const createLog = await Inventory.bulkCreate(dataWithType)
 
       const createPayment = await Payment.create({
         TransactionId: data[0].TransactionId,
@@ -270,6 +274,8 @@ class TrasactionService extends Service {
           },
         ],
       });
+
+      console.log(findTransactions)
       return this.handleSuccess({
         message: "get all transaction success",
         statusCode: 200,
@@ -432,6 +438,7 @@ class TrasactionService extends Service {
       const UserId = req.token.id
 
       delete req.query.id
+      const isPrescription = await Prescription_image.findOne({ where: { TransactionId: parseInt(id) } })
 
       const getData = await Transaction.findOne({
         where: { id: parseInt(id), UserId },
@@ -445,6 +452,7 @@ class TrasactionService extends Service {
               }
             }
           },
+          { model: Prescription_image }
         ]
       })
 
@@ -455,6 +463,7 @@ class TrasactionService extends Service {
       })
 
     } catch (err) {
+      console.log(err)
       return this.handleError({})
     }
   }
