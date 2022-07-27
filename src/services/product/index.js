@@ -207,6 +207,7 @@ class productService extends Service {
 
       const addStockOpname = await Stock_opname.create({
         ProductId: inputProduct.dataValues.id,
+        amount: 0
       });
 
       const result = await Product.findOne({
