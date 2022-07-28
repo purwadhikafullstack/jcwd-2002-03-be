@@ -35,7 +35,6 @@ class productService extends Service {
       let searchByNameClause = {};
 
       if (selectedProduct) {
-        console.log(selectedProduct);
         whereCategoryClause.categoryId = selectedProduct;
       }
 
@@ -127,7 +126,6 @@ class productService extends Service {
           },
         ],
       });
-      console.log(findProduct);
       return this.handleSuccess({
         message: "Product found successfully",
         statusCode: 200,

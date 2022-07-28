@@ -328,7 +328,7 @@ class TrasactionService extends Service {
 
       const dataWithTransactionId = data.map((val) => {
         delete val.Product
-        return { ...val, TransactionId: transactionId, type: "keluar" }
+        return { ...val, TransactionId: transactionId, type: "keluar", }
       })
 
       const addTransactionItems = await Transaction_items.bulkCreate(dataWithTransactionId);
@@ -360,13 +360,22 @@ class TrasactionService extends Service {
     try {
       const { TransactionId } = req.params
       const data = req.body
+
       const approve = await Transaction.update(
-        data
+        { ...data, AdminId: req.token.id }
         , {
           where: {
             id: TransactionId
           }
         })
+
+      const updateInventory = await Inventory.update({ AdminId: req.token.id }, {
+        where: {
+          TransactionId
+        }
+      })
+
+      console.log(updateInventory)
       return this.handleSuccess({
         message: "transaction approve success",
         data: approve,
