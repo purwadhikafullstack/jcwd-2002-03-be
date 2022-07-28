@@ -1,5 +1,5 @@
 const Service = require("../service");
-const { User, ForgotPasswordToken, VerificationToken, Admin } = require("../../lib/sequelize");
+const { User, ForgotPasswordToken, VerificationToken, Admin, Address } = require("../../lib/sequelize");
 const { generateToken } = require("../../lib/jwt")
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
@@ -8,7 +8,7 @@ const fs = require("fs");
 const mailer = require("../../lib/mailer");
 const { nanoid } = require("nanoid");
 const moment = require("moment");
-const { OAuth2Client } = require("google-auth-library")
+const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.CLIENT_ID)
 
 class authService extends Service {
@@ -242,6 +242,9 @@ class authService extends Service {
         where: {
           email: credential,
         },
+        include: {
+          model: Address
+        }
       });
 
       if (!findUser) {

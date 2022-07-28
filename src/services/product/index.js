@@ -35,12 +35,10 @@ class productService extends Service {
       let searchByNameClause = {};
 
       if (selectedProduct) {
-        console.log(selectedProduct);
         whereCategoryClause.categoryId = selectedProduct;
       }
 
       if (searchProduct) {
-        console.log(searchProduct);
         searchByNameClause = {
           med_name: { [Op.like]: `%${searchProduct}%` },
         };
@@ -127,7 +125,6 @@ class productService extends Service {
           },
         ],
       });
-      console.log(findProduct);
       return this.handleSuccess({
         message: "Product found successfully",
         statusCode: 200,
@@ -207,6 +204,7 @@ class productService extends Service {
 
       const addStockOpname = await Stock_opname.create({
         ProductId: inputProduct.dataValues.id,
+        amount: 0
       });
 
       const result = await Product.findOne({
