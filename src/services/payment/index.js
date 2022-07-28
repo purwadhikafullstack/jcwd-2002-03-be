@@ -54,7 +54,19 @@ class PaymentService extends Service {
     static createPayment = async (req) => {
         try {
             const { ongkos_kirim, AddressId, kurir, TransactionId } = req.body
-            console.log(req.body)
+
+            if (!ongkos_kirim || !kurir) {
+                return this.handleError({
+                    message: "Kurir belum di pilih",
+                    statusCode: 404,
+                })
+            }
+            if (!AddressId) {
+                return this.handleError({
+                    message: "Alamat belum dipilih atau data tidak valid",
+                    statusCode: 404,
+                })
+            }
 
             const updateongkirAndAddress = await Transaction.update({
                 ongkos_kirim,
@@ -65,6 +77,22 @@ class PaymentService extends Service {
                     id: TransactionId
                 }
             })
+
+            const cekPayment = await Payment.findOne({
+                where: {
+                    TransactionId
+                }
+            })
+
+            if (cekPayment) {
+                await Payment.update({
+                    methode: "BCA VA",
+                }, {
+                    where: {
+                        TransactionId
+                    }
+                })
+            }
 
             const payment = await Payment.create({
                 methode: "BCA VA",
