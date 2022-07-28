@@ -39,7 +39,6 @@ class productService extends Service {
       }
 
       if (searchProduct) {
-        console.log(searchProduct);
         searchByNameClause = {
           med_name: { [Op.like]: `%${searchProduct}%` },
         };
