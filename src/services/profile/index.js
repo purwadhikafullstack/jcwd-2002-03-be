@@ -6,7 +6,7 @@ class profileService extends Service {
     try {
       const findMyProfile = await User.findOne({
         where: {
-          id: 1,
+          id: req.token.id,
         },
         attributes: {
           exclude: ["password", "updatedAt", "id", "createdAt"],
@@ -45,13 +45,13 @@ class profileService extends Service {
         },
         {
           where: {
-            id: 1,
+            id: req.token.id,
           },
         }
       );
       const name = await User.findOne({
         where: {
-          id: 1,
+          id: req.token.id,
         },
         attributes: ["name"],
       });
@@ -77,7 +77,7 @@ class profileService extends Service {
         },
         {
           where: {
-            id: 1,
+            id: req.token.id,
           },
         }
       );
@@ -103,7 +103,7 @@ class profileService extends Service {
         },
         {
           where: {
-            id: 1,
+            id: req.token.id,
           },
         }
       );
@@ -134,13 +134,13 @@ class profileService extends Service {
         },
         {
           where: {
-            id: 1,
+            id: req.token.id,
           },
         }
       );
       const imageUrl = await User.findOne({
         where: {
-          id: 1,
+          id: req.token.id,
         },
         attributes: ["image_url"],
       });
@@ -171,7 +171,7 @@ class profileService extends Service {
         kodePos,
         main_address,
         city_id,
-        province_id
+        province_id,
       } = req.body;
       const UserId = req.token.id;
 
@@ -207,7 +207,7 @@ class profileService extends Service {
         UserId,
         main_address,
         city_id,
-        province_id
+        province_id,
       });
       return this.handleSuccess({
         message: "your address was added successfully",
@@ -310,23 +310,22 @@ class profileService extends Service {
 
   static deleteAlamat = async (req) => {
     try {
-      const { id } = req.params
-      const UserId = req.token.id
+      const { id } = req.params;
+      const UserId = req.token.id;
       await Address.destroy({
         where: {
           id,
-          UserId
-        }
-      })
+          UserId,
+        },
+      });
 
       return this.handleSuccess({
         message: "delete address success",
         statusCode: 201,
-      })
-
+      });
     } catch (err) {
-      return this.handleError({})
+      return this.handleError({});
     }
-  }
+  };
 }
 module.exports = profileService;
