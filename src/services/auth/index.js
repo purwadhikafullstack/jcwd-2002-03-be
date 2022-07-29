@@ -126,7 +126,7 @@ class authService extends Service {
 
       return this.handleSuccess({
         message: "verify success",
-        redirect: `${process.env.BASE_URL}/verification`
+        redirect: `${process.env.REDIRECT_LINK}/verification`
       })
     } catch (err) {
       console.log(err);
@@ -339,7 +339,7 @@ class authService extends Service {
         UserId: findUser.id,
       });
 
-      const forgotPasswordLink = `${process.env.BASE_URL}/change-forgot-password/${passwordToken}`; $
+      const forgotPasswordLink = `${process.env.REDIRECT_LINK}/change-forgot-password/${passwordToken}`;
 
       const template = fs
         .readFileSync(__dirname + "/../../templates/forgot-template.html")
