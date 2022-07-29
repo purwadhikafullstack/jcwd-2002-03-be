@@ -97,7 +97,6 @@ class profileService extends Service {
   static tambahJk = async (req) => {
     try {
       const { gender } = req.body;
-      console.log(gender);
       const userGender = await User.update(
         {
           gender,
@@ -268,6 +267,7 @@ class profileService extends Service {
               "alamat",
               "kodePos",
               "id",
+              "main_address",
             ],
           },
         ],
