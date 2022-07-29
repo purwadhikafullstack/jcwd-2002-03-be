@@ -234,8 +234,8 @@ class reportService extends Service {
       } else if (stateOfDate === "Bulanan") {
         [results, metadata] = await sequelize.query(
           "SELECT createdAt as `month`, sum(`quantity`) AS `sum` FROM `Transaction_items` AS `Transaction_items` WHERE YEAR (createdAt) = " +
-            moment().format("YYYY") +
-            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+          moment().format("YYYY") +
+          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
       } else if (stateOfDate === "Tahunan") {
         [results, metadata] = await sequelize.query(
@@ -319,13 +319,13 @@ class reportService extends Service {
       } else if (stateOfDate === "Bulanan") {
         const [resultRevenue, metadata] = await sequelize.query(
           "SELECT createdAt as `month`, sum(price * quantity) AS `sum` FROM `Transaction_items` AS `Transaction_items` WHERE YEAR (createdAt) = " +
-            moment().format("YYYY") +
-            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+          moment().format("YYYY") +
+          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
         const [resultCapital, metaData] = await sequelize.query(
           "SELECT createdAt as `month`, sum(buying_price * quantity) AS `sum` FROM `inventories` AS `inventories` WHERE YEAR (createdAt) = " +
-            moment().format("YYYY") +
-            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+          moment().format("YYYY") +
+          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
 
         capital = resultCapital;
@@ -587,23 +587,23 @@ class reportService extends Service {
   };
   static getCancelOrder = async (req) => {
     try {
-        const { stateOfDate = "Bulanan" } = req.body;
+      const { stateOfDate = "Bulanan" } = req.body;
 
-        let results, metadata;
+      let results, metadata;
 
       if (stateOfDate === "Mingguan") {
         [results, metadata] = await sequelize.query(
-          "SELECT WEEK(createdAt) as `week`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY WEEK(createdAt) ORDER BY WEEK(createdAt) ASC"
+          "SELECT WEEK(createdAt) as `week`, count(*) AS `count` FROM `Transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY WEEK(createdAt) ORDER BY WEEK(createdAt) ASC"
         );
       } else if (stateOfDate === "Bulanan") {
         [results, metadata] = await sequelize.query(
-          "SELECT createdAt as `month`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 AND YEAR (createdAt) = " +
-            moment().format("YYYY") +
-            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+          "SELECT createdAt as `month`, count(*) AS `count` FROM `Transactions` AS `transactions` WHERE `isValid` = 0 AND YEAR (createdAt) = " +
+          moment().format("YYYY") +
+          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
       } else if (stateOfDate === "Tahunan") {
         [results, metadata] = await sequelize.query(
-          "SELECT createdAt as `year`, count(*) AS `count` FROM `transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY YEAR(createdAt) ORDER BY YEAR(createdAt) ASC"
+          "SELECT createdAt as `year`, count(*) AS `count` FROM `Transactions` AS `transactions` WHERE `isValid` = 0 GROUP BY YEAR(createdAt) ORDER BY YEAR(createdAt) ASC"
         );
       }
       return this.handleSuccess({
@@ -612,11 +612,11 @@ class reportService extends Service {
         data: results,
       });
     } catch (err) {
-        console.log(err);
-        this.handleError({
-          message: "Server Error",
-          statusCode: 500,
-        }); 
+      console.log(err);
+      this.handleError({
+        message: "Server Error",
+        statusCode: 500,
+      });
     }
   }
 }
