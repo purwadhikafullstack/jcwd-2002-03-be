@@ -13,13 +13,29 @@ router.post(
   }).single("update_image_file"),
   controllers(profileService.editProfilePicture)
 );
-router.post("/tambahAl", authorizedToken, controllers(profileService.tambahAlamat));
-router.post("/tambahNomorHp", controllers(profileService.tambahNomorHp));
-router.post("/tambahJk", controllers(profileService.tambahJk));
-router.post("/tambahTl", controllers(profileService.tambahTl));
-router.get("/", controllers(profileService.getMyProfile));
+router.post(
+  "/tambahAl",
+  authorizedToken,
+  controllers(profileService.tambahAlamat)
+);
+router.post(
+  "/tambahNomorHp",
+  authorizedToken,
+  controllers(profileService.tambahNomorHp)
+);
+router.post("/tambahJk", authorizedToken, controllers(profileService.tambahJk));
+router.post("/tambahTl", authorizedToken, controllers(profileService.tambahTl));
+router.get("/", authorizedToken, controllers(profileService.getMyProfile));
 router.get("/address", authorizedToken, controllers(profileService.getAddress));
-router.get("/address-user", authorizedToken, controllers(profileService.getAddressByUserId));
-router.delete("/address/:id/delete", authorizedToken, controllers(profileService.deleteAlamat))
+router.get(
+  "/address-user",
+  authorizedToken,
+  controllers(profileService.getAddressByUserId)
+);
+router.delete(
+  "/address/:id/delete",
+  authorizedToken,
+  controllers(profileService.deleteAlamat)
+);
 
 module.exports = router;
