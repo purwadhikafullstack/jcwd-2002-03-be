@@ -12,13 +12,11 @@ const {
 } = require("../../lib/sequelize");
 const moment = require("moment");
 
-const TODAY_START = new Date().setUTCHours(0, 0, 0, 0);
-const NOW = new Date();
-const endOfMonth = moment().endOf("month").format("YYYY-MM-DD hh:mm");
-const nextThreeMonth = moment().add(3, "months");
-
 class reportService extends Service {
   static getTransactionCount = async (req) => {
+    const TODAY_START = moment().startOf("day");
+    const NOW = moment().format("YYYY-MM-DD HH:mm");
+
     try {
       let { isSend, isValid, isDone, isPaid, isPacking } = req.body;
 
@@ -99,6 +97,10 @@ class reportService extends Service {
     }
   };
   static getExpInfo = async () => {
+    const NOW = moment().format("YYYY-MM-DD HH:mm");
+    const endOfMonth = moment().endOf("month").format("YYYY-MM-DD HH:mm");
+    const nextThreeMonth = moment().add(3, "months");
+
     try {
       const expProduct = await Inventory.findAll({
         where: {
@@ -149,6 +151,9 @@ class reportService extends Service {
     }
   };
   static getTodayOrder = async (req) => {
+    const TODAY_START = moment().startOf("day");
+    const NOW = moment().format("YYYY-MM-DD HH:mm");
+
     try {
       const todayOrder = await Transaction.count({
         where: {
@@ -187,6 +192,8 @@ class reportService extends Service {
     }
   };
   static getTodayStock = async (req) => {
+    const TODAY_START = moment().startOf("day");
+
     try {
       const todayStock = await Stock_opname.findAll({
         attributes: [[Sequelize.fn("sum", Sequelize.col("amount")), "sum"]],
@@ -234,8 +241,8 @@ class reportService extends Service {
       } else if (stateOfDate === "Bulanan") {
         [results, metadata] = await sequelize.query(
           "SELECT createdAt as `month`, sum(`quantity`) AS `sum` FROM `Transaction_items` AS `Transaction_items` WHERE YEAR (createdAt) = " +
-          moment().format("YYYY") +
-          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+            moment().format("YYYY") +
+            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
       } else if (stateOfDate === "Tahunan") {
         [results, metadata] = await sequelize.query(
@@ -257,6 +264,9 @@ class reportService extends Service {
     }
   };
   static getTodayRevenue = async (req) => {
+    const TODAY_START = moment().startOf("day");
+    const NOW = moment().format("YYYY-MM-DD HH:mm");
+
     try {
       const todayRevenue = await Transaction_items.findAll({
         where: {
@@ -319,13 +329,13 @@ class reportService extends Service {
       } else if (stateOfDate === "Bulanan") {
         const [resultRevenue, metadata] = await sequelize.query(
           "SELECT createdAt as `month`, sum(price * quantity) AS `sum` FROM `Transaction_items` AS `Transaction_items` WHERE YEAR (createdAt) = " +
-          moment().format("YYYY") +
-          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+            moment().format("YYYY") +
+            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
         const [resultCapital, metaData] = await sequelize.query(
           "SELECT createdAt as `month`, sum(buying_price * quantity) AS `sum` FROM `inventories` AS `inventories` WHERE YEAR (createdAt) = " +
-          moment().format("YYYY") +
-          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+            moment().format("YYYY") +
+            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
 
         capital = resultCapital;
@@ -362,6 +372,9 @@ class reportService extends Service {
     }
   };
   static getProductSold = async (req) => {
+    const TODAY_START = moment().startOf("day");
+    const NOW = moment().format("YYYY-MM-DD HH:mm");
+
     try {
       const { stateOfDate = "Bulanan", ProductId } = req.body;
 
@@ -598,8 +611,8 @@ class reportService extends Service {
       } else if (stateOfDate === "Bulanan") {
         [results, metadata] = await sequelize.query(
           "SELECT createdAt as `month`, count(*) AS `count` FROM `Transactions` AS `transactions` WHERE `isValid` = 0 AND YEAR (createdAt) = " +
-          moment().format("YYYY") +
-          " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
+            moment().format("YYYY") +
+            " GROUP BY MONTH(createdAt) ORDER BY MONTH(createdAt) ASC"
         );
       } else if (stateOfDate === "Tahunan") {
         [results, metadata] = await sequelize.query(
@@ -618,7 +631,7 @@ class reportService extends Service {
         statusCode: 500,
       });
     }
-  }
+  };
 }
 
 module.exports = reportService;
